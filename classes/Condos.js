@@ -95,7 +95,7 @@ class Condos{
                     return callback({ status: 500, message: err['sqlMessage'] });
                 }
                   
-                var row = '';
+                var row = { status: 404, message:'Not found'};
                 if (result) {
                     result.forEach(function (value) {
                         row = '{"id":' + value.id +
