@@ -339,8 +339,8 @@ app.post('/contact', function (req, res ){
 /*********************************************************************/
 
 
-var port = 80;
-
+//var port = 80;
+const port = process.env.port || 5000;
 var server = app.listen(port, function () {
    //var hostadd = server.address().address;
    var port = server.address().port;
