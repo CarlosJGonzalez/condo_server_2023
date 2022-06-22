@@ -103,7 +103,7 @@ class Items{
                     return callback( { status: 500, message: err } );
                 }
 
-                let sql = "select `ext_key`, `code`, `description`, `cost`, `budget`, `type`, `unit`, `itemNumber` from `items` where `id`=" + id;
+                let sql = "select `id`, `ext_key`, `code`, `description`, `cost`, `budget`, `type`, `unit`, `itemNumber` from `items` where `id`=" + id;
                 con.query( sql, function( err, result ){
                     con.end();
                     if( err ){
@@ -113,7 +113,8 @@ class Items{
                         if( result.length > 0 ){
                             var row='';
                             result.forEach( function( value ){
-                                row = '{"code":"' + value.code
+                                row = '{"id":' + value.id 
+                                + ',"code":"' + value.code
                                 + '","description":"' + value.description
                                 + '","cost":"' + value.cost
                                 + '","budget":"' + value.budget
@@ -135,6 +136,50 @@ class Items{
             return callback( { status: 500, message: 'Error at Items Class, Get Method' } );
         }
     }    
+
+    async patch( req, form, callback ){
+        try{
+            let conn = require('../helpers/conn');
+            var con = conn.newCon();
+
+            form.parse( req, function( err, data ){
+                if( err ){
+                    return callback( {status: 500, message: "Error at Items Class, Method Patch/form parse"} );
+                }
+                
+                let row = '', where = '';
+                for( var key in data ){
+                    if( key === 'id' ){
+                        where = ' where `id` = ' + data[key];
+                    }else{
+                        row += key + '=' + con.escape( data[key] ) + ',';
+                    }
+                }
+
+                let sqlStr = row.substring( 0, row.length - 1 );
+                sqlStr += where;
+
+                sqlStr = "update `items` set " + sqlStr;
+                con.connect( function( err ) {
+                    if( err ){
+                        con.end();
+                        return callback ( { status: 500, message: err });
+                    }
+                    con.query( sqlStr, function( err, result ){
+                        con.end();
+                        if( err ){
+                            const body = '{"err":' + err['errno'] + ',"message":"' + err['sqlMessage'] + '"}';
+                            return callback( { status: 500, message: body } );
+                        }else{
+                            return callback( { status: 200, message: 'Ok' } );
+                        }
+                    });
+                })
+            });
+        }catch( err) {
+            return callback ({ status: 500, message: 'Error at Items Class, Patch Method' });
+        }
+    }
 }
 
 module.exports = Items;

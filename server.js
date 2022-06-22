@@ -6,20 +6,88 @@ const sgMail = require('@sendgrid/mail');
 app.use(cors({origin: '*'}));
 require('dotenv').config();
 
- app.use(function(req, res, next) {
-   res.header("Access-Control-Allow-Origin", "*");
-   next();
- });
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+    next();
+});
 
 var formidable = require('formidable');
 const perpage = 30;
 
 
-//this value is used to know server status
+//this one is used to know server status
 app.get('/', function (req, res) {
 	res.send('Server online');
 	//redirect to home page
 })
+
+/*******************************************************/
+/******************** Funds / (Fondos) -->*************************/
+/*******************************************************/
+
+app.get('/fund_details/:idFund', function( req, res ){
+	let idFund = req.params.idFund;
+	const FundDetails = require('./classes/Fund_Details.js');
+	const fundDetail = new FundDetails();
+	fundDetail.browse( idFund, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+});
+
+
+app.get('/fund/:idFund', function( req, res ){
+	let idFund = req.params.idFund;
+	const Funds = require('./classes/Funds.js');
+	const fund = new Funds();
+	fund.get( idFund, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+});
+
+
+app.get('/funds/:idCondo', function( req, res ){
+	let idCondo = req.params.idCondo;
+	const Funds = require('./classes/Funds.js');
+	const fund = new Funds();
+	fund.browse( idCondo, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+})
+
+
+/*******************************************************/
+/******************** PERIOD (Gestiones) -->*************************/
+/*******************************************************/
+
+app.get('/period/:id', function( req, res ){
+	let id = req.params.id;
+	const Periods = require('./classes/Periods.js');
+	const period = new Periods();
+	period.get( id, function( result){
+		res.status( result.status ).send( result.message );
+	});
+});
+
+
+app.get('/periods/:idCondo', function( req, res ){
+	let idCondo = req.params.idCondo;
+	const Periods = require('./classes/Periods.js');
+	const period = new Periods();
+	period.browse( idCondo, function( result){
+		res.status( result.status ).send( result.message );
+	});
+});
+
+
+
+
+
+/*******************************************************/
+/*****************<-- PERIOD ***************************/
+/*******************************************************/
+
+
+
 
 /*******************************************************/
 /******************** UNITS -->*************************/
@@ -106,6 +174,14 @@ app.get('/item/:id', function ( req, res ){
 	});
 })
 
+app.patch('/item', function( req, res ){
+	var form = new formidable.IncomingForm();
+	const Items = require('./classes/Items.js');
+	const item = new Items();
+	item.patch( req, form, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+})
 /*********************************************************************/
 /************************** ITEMS --> *********************************/
 /*********************************************************************/
