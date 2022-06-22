@@ -84,7 +84,7 @@ class Condos{
         var conn = require('../helpers/conn');
         var con = conn.newCon();
         id = conn.escape( id );
-return callback ( { status:200, message: 'line 87' } );
+//return callback ( { status:200, message: 'line 87' } );
         con.connect( function( err ){
             if( err ) return callback({ status: 500, message: err['sqlMessage'] });
             
