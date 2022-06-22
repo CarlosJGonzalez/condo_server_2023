@@ -80,6 +80,7 @@ class Condos{
     }
 
     async get( id, callback ){    
+        return callback ( { status:200, message: 'condo get reached' } );
         var conn = require('../helpers/conn');
         var con = conn.newCon();
         id = conn.escape( id );
