@@ -341,8 +341,4 @@ app.post('/contact', function (req, res ){
 
 //var port = 80;
 const port = process.env.port || 5000;
-var server = app.listen(port, function () {
-   //var hostadd = server.address().address;
-   var port = server.address().port;
-   //console.log("server.js running http://127.0.0.1:80", hostadd, port)
-})
+app.listen(port);
