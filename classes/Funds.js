@@ -17,18 +17,20 @@ class Funds{
                         const body = err['sqlMessage'];
                         return callback( { status: 500, message: body } );
                     }else{
-                        var row='';
-                        result.forEach( function( value ){
-                            row = row + '{"id":' + value.id
-                            +',"ext_key":' + value.ext_key
-                            +',"code":"' + value.code
-                            +'","type":"' + value.type
-                            +'","name":"' + value.name
-                            +'","status":' + value.status
-                            +',"balance":"' + value.balance
-                            +'"}';
-                        });
-                        return callback( { status: 200, message: row } );
+                        if( result ){
+                            result.forEach( function( value ){
+                                row = row + '{"id":' + value.id
+                                +',"ext_key":' + value.ext_key
+                                +',"code":"' + value.code
+                                +'","type":"' + value.type
+                                +'","name":"' + value.name
+                                +'","status":' + value.status
+                                +',"balance":"' + value.balance
+                                +'"}';
+                            });
+                            return callback( { status: 200, message: row } );
+                        }
+                        return callback ( { status: 404, message : 'Not Found' } );
                     }
                 })
             })

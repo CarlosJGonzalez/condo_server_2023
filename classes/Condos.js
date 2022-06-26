@@ -95,7 +95,8 @@ class Condos{
                     return callback({ status: 500, message: err['sqlMessage'] });
                 }
                   
-                var row = { status: 404, message:'Not found'};
+                var status = 404;
+                var message = 'Not found';
                 if (result) {
                     result.forEach(function (value) {
                         row = '{"id":' + value.id +
@@ -121,8 +122,10 @@ class Condos{
                         '","admAmount":"' + value.admAmount +
                         '"}';
                     });
+                    status = 200;
+                    message = row;                    
                 }
-                return callback({ status: 200, message: row });
+                return callback({ status: status, message: message });
             });       
         });
     }
