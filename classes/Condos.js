@@ -98,6 +98,7 @@ class Condos{
                 var status = 404;
                 var message = 'Not found';
                 var row = '';
+                console.log( result );
                 if (result) {
                     result.forEach(function (value) {
                         row = '{"id":' + value.id +
