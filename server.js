@@ -182,6 +182,15 @@ app.patch('/item', function( req, res ){
 		res.status( result.status ).send( result.message );
 	});
 })
+
+app.put('/item', function( req, res ){
+	var form = new formidable.IncomingForm();	
+	const Items = require('./classes/Items.js');
+	const item = new Items();
+	item.put( form, req, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+})
 /*********************************************************************/
 /************************** ITEMS --> *********************************/
 /*********************************************************************/
@@ -342,3 +351,4 @@ app.post('/contact', function (req, res ){
 //var port = 80;
 const port = process.env.PORT || 5000;
 app.listen(port);
+console.log('running at '+ port);
