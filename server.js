@@ -22,6 +22,34 @@ app.get('/', function (req, res) {
 })
 
 /*******************************************************/
+/******************** PERIODS -->*************************/
+/*******************************************************/
+app.get('/periods/:idcondo', function( req, res ){
+	let idcondo = req.params.idcondo;
+	const Period = require('./classes/Periods.js');
+	const periods = new Period();
+	periods.browse( idcondo, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+})
+
+app.get('/period/:id', function( req, res ){
+	let id = req.params.id;
+	const Period = require('./classes/Periods.js');
+	const period = new Period();
+	period.get( id, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+})
+
+/*******************************************************/
+/******************** PERIODS -->*************************/
+/*******************************************************/
+
+
+
+
+/*******************************************************/
 /******************** Funds / (Fondos) -->*************************/
 /*******************************************************/
 

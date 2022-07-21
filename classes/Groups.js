@@ -56,7 +56,7 @@ class Groups{
 					return callback ( { status: 500, message: err } )
 				}
 
-				let sql = "select `id`, `code`, `description`, `level` from `codes` where `idcondo`=" + id ;
+				let sql = "select `id`, `code`, `description`, `level`, (select count(*) from items where ext_key= codes.id) as `count` from `codes` where `idcondo`=" + id ;
 				con.query( sql, function( err, result){		
 					con.end();
 					if( err ) {
@@ -70,6 +70,7 @@ class Groups{
 						+',"code":"' + value.code
 						+'","description":"' + value.description 
 						+'","level":"' + value.level
+						+'","count":"' + value.count
 						+'"},';
 					});
 					row = row.substring(0, row.length-1);
