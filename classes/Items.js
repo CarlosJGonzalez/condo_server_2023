@@ -90,8 +90,6 @@ class Items{
         }
     }
 
-
-
     async get( id, callback ){
         try{
             let conn = require( '../helpers/conn' );
@@ -180,6 +178,34 @@ class Items{
             return callback ({ status: 500, message: 'Error at Items Class, Patch Method' });
         }
     }
+
+    async del( id, callback ){
+		let conn = require('../helpers/conn');
+		var con = conn.newCon();
+
+		con.connect(
+			function ( err ){
+				if( err ){
+					const body = err['sqlMessage'];
+					con.end();
+					return callback( { status: 500, message: body } );
+				}else{
+					let strSql = "delete from `items` where `id`="+id;
+					con.query( strSql, function ( err, result ){
+						con.end();
+						if( err ){
+							const body = err['sqlMessage'];
+							return callback( { status: 500, message: body} );
+						}else{
+							return callback( { status: 200, message: 'Ok' } );
+						}
+					});
+				}
+			}
+		)	
+    }
+
+
 }
 
 module.exports = Items;

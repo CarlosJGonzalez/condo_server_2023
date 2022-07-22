@@ -219,6 +219,15 @@ app.put('/item', function( req, res ){
 		res.status( result.status ).send( result.message );
 	});
 })
+
+app.delete('/item/:id', function( req, res ) {
+	let id = req.params.id;
+	const Items = require('./classes/Items.js' );
+	const item = new Items();
+	item.del( id, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+})
 /*********************************************************************/
 /************************** ITEMS --> *********************************/
 /*********************************************************************/
