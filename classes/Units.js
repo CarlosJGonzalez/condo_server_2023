@@ -53,7 +53,7 @@ class Units{
             con.connect( function( err ){
                 if( err ) return callback ({ status: 500, message: err['sqlMessage'] });
                 
-                var sql = "select * from `units` where `extKey`="+id;                
+                var sql = "select * from `units` where `ext_key`="+id;                
                 con.query( sql, function (err, result) {
                     con.end();
                     if (err) {
