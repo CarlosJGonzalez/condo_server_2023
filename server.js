@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 const CondoEmail = require('./classes/CondoEmail.js');
 const sgMail = require('@sendgrid/mail');
-app.use(cors({origin: '*'}));
+app.use(cors({origin: 'https://condo-online.herokuapp.com'}));
 require('dotenv').config();
 
 app.use(function(req, res, next) {
