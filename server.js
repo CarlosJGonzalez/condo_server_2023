@@ -3,11 +3,11 @@ const app = express();
 const cors = require("cors");
 const CondoEmail = require('./classes/CondoEmail.js');
 const sgMail = require('@sendgrid/mail');
-app.use(cors({origin: 'https://condo-online.herokuapp.com'}));
+app.use(cors({origin: '*'}));
 require('dotenv').config();
 
 app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "https://condo-online.herokuapp.com");
+	res.header("Access-Control-Allow-Origin", "*");
     next();
 });
 
@@ -20,6 +20,31 @@ app.get('/', function (req, res) {
 	res.send('Server online');
 	//redirect to home page
 })
+
+
+/*******************************************************/
+/******************** USERS -->*************************/
+/*******************************************************/
+app.get('/login/:email/:pwd', function ( req, res ){
+	let email = req.params.email;
+	let pwd = req.params.pwd;
+	const Login = require('./classes/Users.js');
+	const user = new Login();
+	user.getUserId( email, pwd, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+});
+
+
+
+app.get('/user/:id', function( req, res ){
+	let id = req.params.id;
+	const User = require('./classes/Users.js');
+	const user = new User();
+	user.get( id, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+});
 
 /*******************************************************/
 /******************** PERIODS -->*************************/

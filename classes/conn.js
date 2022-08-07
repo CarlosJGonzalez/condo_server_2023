@@ -15,5 +15,5 @@ function escape( param ){
     return mysql.escape( param );
 }
 
-//module.exports.newCon = newCon;
-//module.exports.escape = escape;
+module.exports.newCon = newCon;
+module.exports.escape = escape;

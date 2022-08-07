@@ -25,7 +25,9 @@
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "mysql": "^2.16.0",
-    "nodemon": "^2.0.19",
     "sequelize": "^5.22.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
   }
 }
