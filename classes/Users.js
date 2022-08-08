@@ -1,5 +1,49 @@
 class Users{
 
+    async checkUserAccount( email, pwd, callback ){
+        /***********************************************
+         * The user was found using email and pwd
+         * Checking if there is more than 3 login failures,
+         * if so, block the account setting `status` = 3
+         */
+        var conn = require( '../helpers/conn' );
+        var con = conn.newCon();
+        email = conn.escape( email );
+        pwd = conn.escape( pwd );
+
+        con.connect( function( err ) {
+            con.end();
+            if( err ) return callback({ status: 500, message: err['slqMessage'] });
+        });
+
+        var sql = "select `id`, `failure` from `users` where (`email`="+email+" and `pwd`="+pwd+" and `active` = 0 ))";
+        con.query( sql, function( err, result ){
+            con.end();
+            if( err ){
+                return callback ({ status:500, message: err['sqlMessage'] });
+            }
+
+            if( result && result.length > 0 ){
+                var id, failure;
+                result.forEach( function( row ){
+                    id = row.id;
+                    failure = row.failure;
+                });
+
+                if( failure > 2 ){
+                    con.query( 'update `users` set `status` = 1 where `id`=' + id );
+                    return callback({ status: 401, message: "Your account is blocked because many login intents. Try again in 15 minutes." });
+                }
+
+            }
+            
+            con.query( 'update `users` set `failure` = `failure` + 1 where `email`=' + email );
+            con.end();
+            
+            return callback ({ status: 500, message: 'User Not Found'  });
+        });
+    }
+
     async getUserId( email, pwd, callback ){
         var conn = require( '../helpers/conn' );
         var con = conn.newCon();
@@ -10,9 +54,9 @@ class Users{
             if( err ) return callback({ status: 500, message: err['sqlMessage'] });
         });
 
-        var sql = "select c.`id` condo_id, c.`condo_name`, c.`logo`, u.`name`, u.`email`, u.`id` user_id from `condos` c inner join `condo_user` cu on c.`id` = cu.`id_condo` ";
-        sql += "inner join `users` u on cu.`id_user` = u.`id` and cu.id_user=(select `id` from `users` where(`email`="+email+" and `pwd`="+pwd+" and status <> 0));";
-        //var sql = "select `id`, `email`, `name` from `users` where(`email`="+email+" and `pwd`="+pwd+" and status <> 0);";
+        var sql = "select c.`id` condo_id, c.`condo_name`, c.`logo`, u.`name`, u.`email`, u.`id` user_id, u.`failure` from `condos` c inner join `condo_user` cu on c.`id` = cu.`id_condo` ";
+        sql += "inner join `users` u on cu.`id_user` = u.`id` and cu.id_user=(select `id` from `users` where(`email`="+email+" and `pwd`="+pwd+" and `active` = 1));";
+        
         con.query( sql, function( err, result ){
             con.end();
             if( err ){
@@ -22,7 +66,6 @@ class Users{
             var user = null;
             var uId = null;
             if( result && result.length > 0){
-                console.log( result);
                 result.forEach(function(row) {
                     uId = row.id;
                     user = '{"condo_id":' + row.condo_id+
