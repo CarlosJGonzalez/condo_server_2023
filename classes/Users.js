@@ -21,7 +21,8 @@ class Users{
 
             var user = null;
             var uId = null;
-            if( result ){
+            if( result && result.length > 0){
+                console.log( result);
                 result.forEach(function(row) {
                     uId = row.id;
                     user = '{"condo_id":' + row.condo_id+
@@ -33,7 +34,7 @@ class Users{
                 });
                 return callback ({ status:200, message:user });
             }
-            return callback({ status:404, message: 'Not Found' });
+            return callback({ status:404, message: 'User Not Found' });
         });
     }
 

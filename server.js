@@ -37,11 +37,11 @@ app.get('/login/:email/:pwd', function ( req, res ){
 
 
 
-app.get('/user/:id', function( req, res ){
+app.get('/user/role/:id', function( req, res ){
 	let id = req.params.id;
 	const User = require('./classes/Users.js');
 	const user = new User();
-	user.get( id, function( result ){
+	user.getRole( id, function( result ){
 		res.status( result.status ).send( result.message );
 	});
 });
