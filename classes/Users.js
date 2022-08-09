@@ -1,10 +1,16 @@
 class Users{
 
-    checkUserAccount( email, pwd, callback ){
-        /***********************************************
-         * The user was found using email and pwd
-         * Checking if there is more than 3 login failures,
-         * if so, block the account setting `status` = 3
+    async checkUserAccount( email, pwd, checkback ){
+        /*****************************************************
+         * 1 - Check if the email exists => take: id, failure
+            * 1.1 - Checking if pwd match: 
+            *      Yes: 
+            *          if active == 0 return 401
+            *          if active == 1 return 200
+            *      No:
+            *          if failure > 2 => active = 0
+            *          else failure++
+         * 2 - 
          */
         var conn = require( '../helpers/conn' );
         var con = conn.newCon();
@@ -12,14 +18,14 @@ class Users{
         pwd = conn.escape( pwd );
 
         con.connect( function( err ) {
-            if( err ) return callback({ status: 500, message: err['sqlMessage'] });
+            if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
         });
 
-        var sql = 'select `id`, `failure` from `users` where (`email`='+email+' and `pwd`='+pwd+')';
+        var sql = 'select `id`, `failure` from `users` where (`email`=' + email + ')';
         con.query( sql, function( err, result ){
             if( err ){
                 con.end();
-                return callback({ status: 500, message: err['sqlMessage'] });
+                return checkback({ status: 500, message: err['sqlMessage'] });
             }
 
             if( result && result.length > 0 ){
@@ -29,39 +35,54 @@ class Users{
                     failure = row.failure;
                 });
 
-                if( parseInt( failure ) > 2 ){
-                    sql = 'update `users` set `active` = 0 where `id`=' + id;
-                    con.query( sql, function( err, result){
-                        con.end();
-                        if( err ){
-                            return callback({ status: 500, message: err['sqlMessage'] });
-                        }
-                        return callback({ status: 401, message: "Account blocked. Too many login intents. Try again in 15 minutes." });
-                    });
-                }else{
-                    return callback({ status: 200, message: 'success' });
-                }
-            }else{            
-                sql = 'update `users` set `failure` = `failure` + 1 where `email`=' + email;
-                con.query( sql, function( err, result ) {
-                    con.end();
+                /**********************************************
+                 * The email exists; now check if the pwd match
+                 */
+                sql = 'select `id`, `failure`, `active` from `users` where (`email`='+email+' and `pwd`='+pwd+')';
+                con.query( sql, function( err, result ){
                     if( err ) {
-                        return callback({ status: 500, message: sql });
+                        con.end();
+                        return checkback({ status:500, message: err['sqlMessage'] });
                     }
-                    return  callback({ status: 201, message: result  });
+                  
+                    if( result && result.length > 0 ){
+                        con.end();
+                        var active;
+                        result.forEach( function( row ){
+                            active = row.active;
+                        });
+
+                        if( active == 0 ) return checkback({ status: 401, message: 'Account blocked. Too many login intents. Try again in 15 minutes.' });
+
+                        return checkback({ status: 200, message: 'success' });
+
+                    }else if( parseInt( failure ) > 2 ){
+                        sql = 'update `users` set `active` = 0 where `id`=' + id;
+                        con.query( sql, function( err, result){
+                            con.end();
+                            if( err ){
+                                return checkback({ status: 500, message: err['sqlMessage'] });
+                            }
+                            return checkback({ status: 401, message: "Account blocked. Too many login intents. Try again in 15 minutes." });
+                        });
+
+                    }else{                  
+                       sql = "update `users` set `failure`=`failure` + 1 where `id`=" + id;
+                       con.query( sql, function( err, result ){
+                        if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
+
+                        return checkback({ status: 404, message: 'Wrong Email or Password' });
+                       });
+                    }
                 });
+
+            }else{             
+                return checkback({ status: 401, message: 'Wrong email or password' });
             }
         });
     }
 
     async getUserId( email, pwd, callback ){
-        await this.checkUserAccount( email, pwd, function( res ){
-            if( res.status != 200 ){
-                return callback({ res });
-            };
-        });
-
-
         var conn = require( '../helpers/conn' );
         var con = conn.newCon();
         email = conn.escape( email );
@@ -70,9 +91,6 @@ class Users{
         con.connect( function( err ) {
             if( err ) return callback({ status: 500, message: err['sqlMessage'] });
         });
-
-    
-        
 
         var sql = "select c.`id` condo_id, c.`condo_name`, c.`logo`, u.`name`, u.`email`, u.`id` user_id, u.`failure` from `condos` c inner join `condo_user` cu on c.`id` = cu.`id_condo` ";
         sql += "inner join `users` u on cu.`id_user` = u.`id` and cu.id_user=(select `id` from `users` where(`email`="+email+" and `pwd`="+pwd+" and `active` = 1));";
@@ -97,7 +115,7 @@ class Users{
                 });
                 return callback({ status:200, message: user });
             }
-            return callback({ status: 404, message: 'User Not Found' });
+            return callback({ status: 404, message: 'User Not Found!' });
         });
     }
 

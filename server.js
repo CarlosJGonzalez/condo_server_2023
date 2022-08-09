@@ -30,8 +30,15 @@ app.get('/login/:email/:pwd', function ( req, res ){
 	let pwd = req.params.pwd;
 	const Login = require('./classes/Users.js');
 	const user = new Login();
-	user.getUserId( email, pwd, function( result ){
-		res.status( result.status ).send( result.message );
+
+	user.checkUserAccount( email, pwd, function( result ){
+		if( result.status != 200 ){
+			res.status( result.status ).send( result.message );
+		}else{
+			user.getUserId( email, pwd, function( result ){
+				res.status( result.status ).send( result.message );
+			});
+		}
 	});
 });
 
