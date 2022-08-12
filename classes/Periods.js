@@ -21,21 +21,26 @@ class Periods{
                     }
 
                     if( result && result.length > 0 ){
-                        var row = '[';
+                        var row = '{"result":[';
                         result.forEach( function( value ) {
-                            row = row + '{"id":' + value.id
-                            +',"start":'    + value.start
-                            +',"end":'      + value.end
-                            +',"amount":'   + value.amount
-                            +',"status":'   + value.status
-                            +',"previuos":' + value.previous
-                            +',"due":'      + value.due
-                            +',"collected":'+ value.collected
-                            +',"balance":'  + value.balance
+                            var start = value.start;
+                            start = start.getFullYear() + "-" + start.getMonth() + "-" + start.getDate();
+                            var end = value.end;
+                            end = end.getFullYear() + "-" + end.getMonth() + "-" + end.getDate();
+
+                            row += '{"id":' + value.id
+                            +',"start":"'    + start
+                            +'","end":"'      + end
+                            +'","amount":"'   + value.amount
+                            +'","status":'   + value.status
+                            +',"previous":"' + value.previous
+                            +'","due":"'      + value.due
+                            +'","collected":"'+ value.collected
+                            +'","balance":"'  + value.balance
                             +'"},';
                         });
                         row = row.substring(0, row.length-1);
-                        row += ']';
+                        row += ']}';
                         return callback({ status: 200, message: row });
                     }
                     return callback ({ status: 404, message: 'Not Found' } );

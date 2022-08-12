@@ -2,14 +2,14 @@ const express = require('express');
 const app = express();
 const cors = require("cors");
 const CondoEmail = require('./classes/CondoEmail.js');
-const sgMail = require('@sendgrid/mail');
-app.use(cors({origin: 'https://condo-online.herokuapp.com'}));
+// const sgMail = require('@sendgrid/mail');
+app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8081'] }));
 require('dotenv').config();
 
-app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "https://condo-online.herokuapp.com");
-    next();
-});
+// app.use(function(req, res, next) {
+// 	res.header("Access-Control-Allow-Origin", "https://condo-online.herokuapp.com,http://localhost");
+//     next();
+// });
 
 
 var formidable = require('formidable');
@@ -401,8 +401,8 @@ app.post('/contact', function (req, res ){
 			subject: data['subject'],
 			html: 'My name is: ' + data['name'] + '<br>My Email is: ' + data['email'] + '<br>The Message: ' + data['message']
 		}
-		sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-		sgMail.send(msg);
+		//sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+		//sgMail.send(msg);
 
 		if( err ) {
 		res.send(err) 
