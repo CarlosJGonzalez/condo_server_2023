@@ -6,11 +6,6 @@ const CondoEmail = require('./classes/CondoEmail.js');
 app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8081'] }));
 require('dotenv').config();
 
-// app.use(function(req, res, next) {
-// 	res.header("Access-Control-Allow-Origin", "https://condo-online.herokuapp.com,http://localhost");
-//     next();
-// });
-
 
 var formidable = require('formidable');
 const perpage = 30;
@@ -19,7 +14,6 @@ const perpage = 30;
 //this one is used to know server status
 app.get('/', function (req, res) {
 	res.send('Server online');
-	//redirect to home page
 })
 
 
@@ -53,6 +47,28 @@ app.get('/user/role/:id', function( req, res ){
 		res.status( result.status ).send( result.message );
 	});
 });
+
+
+/*******************************************************/
+/******************** PERIOD DETAILS -->*************************/
+/*******************************************************/
+app.get('/period_details/:idPeriod', function( req, res ){
+	let idPeriod = req.params.idPeriod;
+	const detPeriods = require('./classes/Period_Details.js');
+	const detPeriod = new detPeriods();
+	detPeriod.browse( idPeriod, function( result ){
+		res.status( result.status).send( result.message );
+	})
+});
+
+
+
+
+
+
+
+
+
 
 /*******************************************************/
 /******************** PERIODS -->*************************/

@@ -10,9 +10,9 @@ class Periods_Details{
                 }
                 /*
                 `id` int(7) NOT NULL,
-                `ext_key` int(7) NOT NULL,
-                `exp_number` int(7) NOT NULL,
-                `id_exp` int(7) NOT NULL,
+                `ext_key` int(7) NOT NULL,                          **** link with period.id *****
+                `exp_number` int(7) NOT NULL,                       **** order listing ****
+                `id_exp` int(7) NOT NULL,                           **** link with expenses table ****
                 `code` varchar(20) NOT NULL,
                 `description` varchar(100) NOT NULL,
                 `unit` varchar(20) NOT NULL,
@@ -25,6 +25,8 @@ class Periods_Details{
                 `invoice_description` varchar(100) DEFAULT NULL,
                 `kind` tinyint(4) NOT NULL,
                 `id_unit` int(7) NOT NULL,
+                `created_at` DATETIME,
+                `edited_at` TIMESTAMP
                 */
                 let sql = "select * from `period_details` where `ext_key` = " + ext_key;
                 con.query( sql, function( err, result ){
@@ -51,7 +53,8 @@ class Periods_Details{
                             +'","invoice_description":"' + value.invoice_description
                             +'","kind":"' + value.kind
                             +'","id_unit":' + value.id_unit
-                            +'},'
+                            +',"created_at":"' + value.created_at
+                            +'"},'
                         });
                         row = row.substring(0, row.length - 1);
                         return callback( { status: 200, message: row } );
@@ -60,6 +63,23 @@ class Periods_Details{
             });
         }catch( err ){
             return callback( { status: 500, message: 'Error at Period_Details, Browse Method' });
+        }
+    }
+
+    async get( id, callback ){
+        try{
+            let conn = require('../helpers/conn');
+            let con = new conn.newCon();
+            con.connect( function ( err ) {
+                if( err ){
+                    con.end();
+                    return callback({ status: 500, message: err });
+                }
+
+                let sql = "select * from `period_details` where `id` = " + id;
+            })
+        }catch( err ){
+
         }
     }
 }
