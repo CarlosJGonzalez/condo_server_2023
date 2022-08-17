@@ -76,14 +76,14 @@ class Periods{
                         var row='';
                         result.forEach(function(value){
                             row = row + '{"id":' + value.id
-                            +',"start":'    + value.start
-                            +',"end":'      + value.end
-                            +',"amount":'   + value.amount
-                            +',"status":'   + value.status
-                            +',"previuos":' + value.previous
-                            +',"due":'      + value.due
-                            +',"collected":'+ value.collected
-                            +',"balance":'  + value.balance
+                            +',"start":"'    + value.start
+                            +'","end":"'      + value.end
+                            +'","amount":"'   + value.amount
+                            +'","status":'   + value.status
+                            +',"previuos":"' + value.previous
+                            +'","due":"'      + value.due
+                            +'","collected":"'+ value.collected
+                            +'","balance":"'  + value.balance
                             +'"},';
                         });
                         row = row.substring(0, row.length-1);
