@@ -49,9 +49,10 @@ app.get('/user/role/:id', function( req, res ){
 });
 
 
-/*******************************************************/
+/****************************************************************/
 /******************** PERIOD DETAILS -->*************************/
-/*******************************************************/
+/****************************************************************/
+/** Get details for the giving Period ***************************/
 app.get('/period_details/:idPeriod', function( req, res ){
 	let idPeriod = req.params.idPeriod;
 	const detPeriods = require('./classes/Period_Details.js');

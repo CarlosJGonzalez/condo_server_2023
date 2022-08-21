@@ -51,8 +51,8 @@ class Periods_Details{
                             +',"check_number":"' + value.check_number
                             +'","invoice_number":"' + value.invoice_number
                             +'","invoice_description":"' + value.invoice_description
-                            +'","kind":"' + value.kind
-                            +'","id_unit":' + value.id_unit
+                            +'","kind":' + value.kind
+                            +',"id_unit":' + value.id_unit
                             +',"created_at":"' + value.created_at
                             +'"},'
                         });
