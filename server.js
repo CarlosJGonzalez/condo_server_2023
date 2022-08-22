@@ -6,7 +6,7 @@ const CondoEmail = require('./classes/CondoEmail.js');
 app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8081'] }));
 require('dotenv').config();
 app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "https://condo-online.herokuapp.com,http://localhost");
+	res.header("Access-Control-Allow-Origin", "https://condo-online.herokuapp.com");
     next();
 });
 
