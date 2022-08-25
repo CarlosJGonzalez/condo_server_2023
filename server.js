@@ -33,14 +33,13 @@ const authenticateJWT = ( req, res, next ) => {
 
 
 // const sgMail = require('@sendgrid/mail');
-app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8081', '*'] }));
+//app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8081', '*'] }));
 //app.use(bodyparser.json());
 require('dotenv').config();
 app.use(function(req, res, next) {
-	res.header(
-		{
-			"Access-Control-Allow-Origin": "*", 
-		});
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
     next();
 });
 
