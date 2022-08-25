@@ -2,11 +2,46 @@ const express = require('express');
 const app = express();
 const cors = require("cors");
 const CondoEmail = require('./classes/CondoEmail.js');
+const jwt = require('jsonwebtoken');
+
+const authenticateJWT = ( req, res, next ) => {
+	const authHeader = req.headers.authorization;
+	var tokenParts = null;
+	if( authHeader ){
+		tokenParts = authHeader.split(" ");
+	}
+
+	if( tokenParts && tokenParts[0] === "Bearer" && tokenParts[1].match(/\S+\.\S+\.\S+/) !== null ){
+		//try{
+			jwt.verify( tokenParts[1], process.env.JWT_KEY, ( err, user )=> {
+				if( err ){
+					return res.sendStatus( 401 );
+				}
+
+				req.user = user;
+				next();
+			});
+
+		// } catch ( error ){
+		// 	res.status( 401 ).json({success: false, message: 'User Not Authenticated'});
+		// 	return next( {success: false, message: 'User Not Authenticated'} );
+		// }
+	} else {
+		res.sendStatus( 401 );
+	}
+};
+
+
 // const sgMail = require('@sendgrid/mail');
-app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8081'] }));
+app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8081', '*'] }));
+//app.use(bodyparser.json());
 require('dotenv').config();
 app.use(function(req, res, next) {
-	res.header("Access-Control-Allow-Origin", "https://condo-online.herokuapp.com");
+	res.header(
+		[
+			"Access-Control-Allow-Origin", 
+			"https://condo-online.herokuapp.com"
+		]);
     next();
 });
 
@@ -17,6 +52,20 @@ var formidable = require('formidable');
 app.get('/', function (req, res) {
 	res.send('Server online');
 })
+
+
+app.post('/token', (req, res) => {
+	var form = new formidable.IncomingForm();
+	if( !form ){
+		return res.sendStatus( 401 );
+	}
+	const User = require('./classes/Users.js');
+	const refreshToken = new User();
+	
+	refreshToken.refreshToken(req, form, function( result ){
+		res.status( result.status ).send( result.message );
+	});
+});
 
 
 /*******************************************************/
@@ -55,7 +104,7 @@ app.get('/user/role/:id', function( req, res ){
 /******************** PERIOD DETAILS -->*************************/
 /****************************************************************/
 /** Get details for the giving Period ***************************/
-app.get('/period_details/:idPeriod', function( req, res ){
+app.get('/period_details/:idPeriod',  authenticateJWT, function( req, res ){
 	let idPeriod = req.params.idPeriod;
 	const detPeriods = require('./classes/Period_Details.js');
 	const detPeriod = new detPeriods();
@@ -66,17 +115,10 @@ app.get('/period_details/:idPeriod', function( req, res ){
 
 
 
-
-
-
-
-
-
-
 /*******************************************************/
 /******************** PERIODS -->*************************/
 /*******************************************************/
-app.get('/periods/:idcondo', function( req, res ){
+app.get('/periods/:idcondo', authenticateJWT, function( req, res ){
 	let idcondo = req.params.idcondo;
 	const Period = require('./classes/Periods.js');
 	const periods = new Period();
@@ -85,7 +127,7 @@ app.get('/periods/:idcondo', function( req, res ){
 	});
 })
 
-app.get('/period/:id', function( req, res ){
+app.get('/period/:id', authenticateJWT, function( req, res ){
 	let id = req.params.id;
 	const Period = require('./classes/Periods.js');
 	const period = new Period();
@@ -105,7 +147,7 @@ app.get('/period/:id', function( req, res ){
 /******************** Funds / (Fondos) -->*************************/
 /*******************************************************/
 
-app.get('/fund_details/:idFund', function( req, res ){
+app.get('/fund_details/:idFund', authenticateJWT, function( req, res ){
 	let idFund = req.params.idFund;
 	const FundDetails = require('./classes/Fund_Details.js');
 	const fundDetail = new FundDetails();
@@ -115,7 +157,7 @@ app.get('/fund_details/:idFund', function( req, res ){
 });
 
 
-app.get('/fund/:idFund', function( req, res ){
+app.get('/fund/:idFund', authenticateJWT, function( req, res ){
 	let idFund = req.params.idFund;
 	const Funds = require('./classes/Funds.js');
 	const fund = new Funds();
@@ -125,7 +167,7 @@ app.get('/fund/:idFund', function( req, res ){
 });
 
 
-app.get('/funds/:idCondo', function( req, res ){
+app.get('/funds/:idCondo', authenticateJWT, function( req, res ){
 	let idCondo = req.params.idCondo;
 	const Funds = require('./classes/Funds.js');
 	const fund = new Funds();
@@ -139,7 +181,7 @@ app.get('/funds/:idCondo', function( req, res ){
 /******************** PERIOD (Gestiones) -->*************************/
 /*******************************************************/
 
-app.get('/period/:id', function( req, res ){
+app.get('/period/:id', authenticateJWT, function( req, res ){
 	let id = req.params.id;
 	const Periods = require('./classes/Periods.js');
 	const period = new Periods();
@@ -149,7 +191,7 @@ app.get('/period/:id', function( req, res ){
 });
 
 
-app.get('/periods/:idCondo', function( req, res ){
+app.get('/periods/:idCondo', authenticateJWT, function( req, res ){
 	let idCondo = req.params.idCondo;
 	const Periods = require('./classes/Periods.js');
 	const period = new Periods();
@@ -172,7 +214,7 @@ app.get('/periods/:idCondo', function( req, res ){
 /*******************************************************/
 /******************** UNITS -->*************************/
 /*******************************************************/
-app.put('/unit', function ( req, res ){
+app.put('/unit', authenticateJWT, function ( req, res ){
 	var form = new formidable.IncomingForm();
 	const Unit = require('./classes/Units.js');
 	const unit = new Unit();
@@ -186,7 +228,7 @@ app.put('/unit', function ( req, res ){
 });
 
 
-app.delete('/unit/:id', function (req , res) {
+app.delete('/unit/:id', authenticateJWT, function (req , res) {
 	const Unit = require('./classes/Units.js');
 	const delUnit = new Unit();	
 	delUnit.del( req.params.id, res, function( result){
@@ -195,7 +237,7 @@ app.delete('/unit/:id', function (req , res) {
 })
 
 
-app.get('/unit/:id', async function ( req, res ){
+app.get('/unit/:id', authenticateJWT, async function ( req, res ){
 	let id = req.params.id;
 	const Unit = require('./classes/Units.js');
 	const unit = new Unit();
@@ -204,7 +246,7 @@ app.get('/unit/:id', async function ( req, res ){
 	});
 });
 
-app.get('/units/:idcondo', function ( req, res ){
+app.get('/units/:idcondo', authenticateJWT, function ( req, res ){
 	let idcondo = req.params.idcondo;
 	const Unit = require('./classes/Units.js');
 	const unit = new Unit();
@@ -214,7 +256,7 @@ app.get('/units/:idcondo', function ( req, res ){
 });
 
 
-app.patch('/unit', function( req, res ){
+app.patch('/unit', authenticateJWT, function( req, res ){
 	var form = new formidable.IncomingForm();
 	const Unit = require('./classes/Units.js');
 	const unit = new Unit();
@@ -233,7 +275,7 @@ app.patch('/unit', function( req, res ){
 /*********************************************************************/
 /************************** ITEMS --> *********************************/
 /*********************************************************************/
-app.get('/items/:id', function (req, res ){
+app.get('/items/:id', authenticateJWT, function (req, res ){
 	//:id represent the Group Id
 	let groupId = req.params.id;
 	const Item = require('./classes/Items.js');
@@ -245,7 +287,7 @@ app.get('/items/:id', function (req, res ){
 });
 
 
-app.get('/item/:id', function ( req, res ){
+app.get('/item/:id', authenticateJWT, function ( req, res ){
 	let itemId = req.params.id;
 	const Items = require('./classes/Items.js');
 	const item = new Items();
@@ -254,7 +296,7 @@ app.get('/item/:id', function ( req, res ){
 	});
 })
 
-app.patch('/item', function( req, res ){
+app.patch('/item', authenticateJWT, function( req, res ){
 	var form = new formidable.IncomingForm();
 	const Items = require('./classes/Items.js');
 	const item = new Items();
@@ -263,7 +305,7 @@ app.patch('/item', function( req, res ){
 	});
 })
 
-app.put('/item', function( req, res ){
+app.put('/item', authenticateJWT, function( req, res ){
 	var form = new formidable.IncomingForm();	
 	const Items = require('./classes/Items.js');
 	const item = new Items();
@@ -272,7 +314,7 @@ app.put('/item', function( req, res ){
 	});
 })
 
-app.delete('/item/:id', function( req, res ) {
+app.delete('/item/:id', authenticateJWT, function( req, res ) {
 	let id = req.params.id;
 	const Items = require('./classes/Items.js' );
 	const item = new Items();
@@ -294,7 +336,7 @@ app.delete('/item/:id', function( req, res ) {
 /*********************************************************************/
 const Group = require('./classes/Groups.js');
 const group = new Group();
-app.put('/group', function( req, res ){
+app.put('/group', authenticateJWT, function( req, res ){
 	var form = new formidable.IncomingForm();
 	group.put( form, req, function( result ){	
 		if( result.hasOwnProperty( 'id') ){
@@ -305,21 +347,21 @@ app.put('/group', function( req, res ){
 	});
 });
 
-app.get('/groups', function( req, res){
+app.get('/groups', authenticateJWT, function( req, res){
 	var idcondo=1;//TO DO 
 	group.browse( idcondo, function( result ){
 		res.status( result.status ).send( result.message );
 	});
 });
 
-app.get('/group/:id', function( req, res) {
+app.get('/group/:id', authenticateJWT, function( req, res) {
 	let id = req.params.id;
 	group.get( id, function( result ){
 		res.status( result.status ).send( result.message );
 	});
 });
 
-app.patch('/group', function ( req, res ){
+app.patch('/group', authenticateJWT, function ( req, res ){
 	var form = new formidable.IncomingForm();
 	group.patch( req, form, function( result ){
 		res.status( result.status ).send( result.message );
@@ -327,7 +369,7 @@ app.patch('/group', function ( req, res ){
 })
 
 
-app.delete('/group/:id', function( req, res ){
+app.delete('/group/:id', authenticateJWT, function( req, res ){
 	let id = req.params.id;
 	group.del( id, function( result ){
 		res.status( result.status ).send( result.message );
@@ -345,7 +387,7 @@ app.delete('/group/:id', function( req, res ){
 
 const Condo = require('./classes/Condos.js');
 const condo = new Condo();
-app.put('/condo', function( req, res ){
+app.put('/condo', authenticateJWT, function( req, res ){
 	console.log( 'put condo' );
 })
 
@@ -353,7 +395,7 @@ app.put('/condo', function( req, res ){
 // 	console.log( 'browsing - listing condos' );
 // })
 
-app.get('/condo/:id', function( req, res){
+app.get('/condo/:id', authenticateJWT, function( req, res){
 	let id = req.params.id;
 	const Condos = require('./classes/Condos.js');	
 	const condo = new Condos();	
@@ -362,7 +404,7 @@ app.get('/condo/:id', function( req, res){
 	});
 })
 
-app.get('/condo/:id/email', function( req, res ){
+app.get('/condo/:id/email', authenticateJWT, function( req, res ){
 	let id = req.params.id;
 	const condoEmail = new CondoEmail();
 	condoEmail.get( id, function( result ){
@@ -376,8 +418,7 @@ app.delete('/condo/:id', function( req, res){
 })
 
 /** patching **/
-app.patch('/condo/:id', function( req, res){
-	//res.send('patching condo info');
+app.patch('/condo/:id',  function( req, res){
 	var form = new formidable.IncomingForm();
 	const Condos = require('./classes/Condos.js');	
 	const condo = new Condos();

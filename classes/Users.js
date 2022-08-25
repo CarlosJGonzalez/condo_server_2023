@@ -1,4 +1,38 @@
+const jwt = require("jsonwebtoken");
+const refreshTokens = [];
+const JWT_REFRESH_TOKEN = process.env.JWT_REFRESH_TOKEN;
+const JWT_KEY = process.env.JWT_KEY;
+
 class Users{
+
+    refreshToken( req, form, callback ){
+        
+        form.parse( req, function( err, data ){
+            for( var key in data ){
+                var token = data['token'];
+            }
+
+        if( !refreshTokens.includes( token ) ){
+            return callback({ status: 403, message: 'Unauthorized. You should do login.' });
+        };
+    
+        jwt.verify( token, JWT_REFRESH_TOKEN, (err, user ) => {
+            if( err ){
+                return callback({ status: 403, message: err });
+            }
+            const userJWT = {
+                id: user.userid,
+                name: user.username,
+                email: user.email,
+                role: 'admin'
+            };
+
+            const accessToken = jwt.sign( userJWT, JWT_KEY, { expiresIn: 60 });//'20m'
+            var resp = '{"refreshtoken":"' + accessToken + '"}';
+            return callback ({ "status": 200,  message: resp });
+        });
+    });
+    }
 
     async checkUserAccount( email, pwd, checkback ){
         /*****************************************************
@@ -104,6 +138,16 @@ class Users{
             var user = null;
             var uId = null;
             if( result && result.length > 0){
+                const userJWT = {
+                    id: result.user_id,
+                    name: result.name,
+                    email: email,
+                    role: 'admin'
+                };
+                const token = jwt.sign( userJWT, process.env.JWT_KEY, { expiresIn: 20 } );
+                const refreshToken = jwt.sign( userJWT, process.env.JWT_REFRESH_TOKEN );
+                refreshTokens.push( refreshToken );
+
                 result.forEach(function(row) {
                     uId = row.id;
                     user = '{"condo_id":' + row.condo_id+
@@ -111,6 +155,8 @@ class Users{
                         '","user_id":'+row.user_id+
                         ',"email":"'+row.email+
                         '","user_name":"'+row.name+
+                        '","token":"' +token+
+                        '","refreshToken":"' +refreshToken+
                     '"}';
                 });
                 return callback({ status:200, message: user });
