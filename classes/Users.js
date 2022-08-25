@@ -11,7 +11,7 @@ class Users{
             for( var key in data ){
                 var token = data['token'];
             }
-
+//
         if( !refreshTokens.includes( token ) ){
             return callback({ status: 403, message: 'Unauthorized. You should do login.' });
         };
