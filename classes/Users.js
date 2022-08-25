@@ -27,7 +27,7 @@ class Users{
                 role: 'admin'
             };
 
-            const accessToken = jwt.sign( userJWT, JWT_KEY, { expiresIn: 60 });//'20m'
+            const accessToken = jwt.sign( userJWT, JWT_KEY, { expiresIn: '20m' });
             var resp = '{"refreshtoken":"' + accessToken + '"}';
             return callback ({ "status": 200,  message: resp });
         });
@@ -144,7 +144,7 @@ class Users{
                     email: email,
                     role: 'admin'
                 };
-                const token = jwt.sign( userJWT, process.env.JWT_KEY, { expiresIn: 20 } );
+                const token = jwt.sign( userJWT, process.env.JWT_KEY, { expiresIn: '20m' } );
                 const refreshToken = jwt.sign( userJWT, process.env.JWT_REFRESH_TOKEN );
                 refreshTokens.push( refreshToken );
 
