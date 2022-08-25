@@ -38,10 +38,9 @@ app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8
 require('dotenv').config();
 app.use(function(req, res, next) {
 	res.header(
-		[
-			"Access-Control-Allow-Origin", 
-			"https://condo-online.herokuapp.com"
-		]);
+		{
+			"Access-Control-Allow-Origin": "*", 
+		});
     next();
 });
 
