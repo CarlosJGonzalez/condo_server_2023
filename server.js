@@ -12,7 +12,7 @@ const authenticateJWT = ( req, res, next ) => {
 	}
 
 	if( tokenParts && tokenParts[0] === "Bearer" && tokenParts[1].match(/\S+\.\S+\.\S+/) !== null ){
-		//try{
+		try{
 			jwt.verify( tokenParts[1], process.env.JWT_KEY, ( err, user )=> {
 				if( err ){
 					return res.sendStatus( 401 );
@@ -22,10 +22,10 @@ const authenticateJWT = ( req, res, next ) => {
 				next();
 			});
 
-		// } catch ( error ){
-		// 	res.status( 401 ).json({success: false, message: 'User Not Authenticated'});
-		// 	return next( {success: false, message: 'User Not Authenticated'} );
-		// }
+		} catch ( error ){
+			res.status( 401 ).json({success: false, message: 'User Not Authenticated'});
+			return next( {success: false, message: 'User Not Authenticated'} );
+		}
 	} else {
 		res.sendStatus( 401 );
 	}
@@ -53,7 +53,7 @@ app.get('/', function (req, res) {
 app.post('/token', (req, res) => {
 	var form = new formidable.IncomingForm();
 	if( !form ){
-		return res.sendStatus( 401 );
+		return res.sendStatus( 400 );
 	}
 	const User = require('./classes/Users.js');
 	const refreshToken = new User();
@@ -67,20 +67,36 @@ app.post('/token', (req, res) => {
 /*******************************************************/
 /******************** USERS -->*************************/
 /*******************************************************/
-app.get('/login/:email/:pwd', function ( req, res ){
-	let email = req.params.email;
-	let pwd = req.params.pwd;
-	const Login = require('./classes/Users.js');
-	const user = new Login();
+ app.post('/login', async function ( req, res, next ){
+	var form = new formidable.IncomingForm();
+	if( !form ){
+		return res.sendStatus( 400 );
+	}
 
-	user.checkUserAccount( email, pwd, function( result ){
-		if( result.status != 200 ){
-			res.status( result.status ).send( result.message );
-		}else{
-			user.getUserId( email, pwd, function( result ){
-				res.status( result.status ).send( result.message );
-			});
+	form.parse( req, function( err, fields ){
+		const required = ['email', 'pwd'];
+		for( let field in fields ){
+			if( required.indexOf( field ) == -1 ){
+				res.status(400).send('A required field is missed.');
+				return;
+			}
 		}
+		var email = fields.email;
+		var pwd = fields.pwd;
+
+		const Login = require('./classes/Users.js');
+		const user = new Login();
+	
+		user.checkUserAccount( email, pwd, function( result ){
+				if( result.status != 200 ){
+					res.status( result.status ).send( result.message );
+				}
+				next();
+			}, 
+			user.getUserId ( email, pwd, function( result ){
+				res.status( result.status ).send( result.message );
+			})
+		);
 	});
 });
 

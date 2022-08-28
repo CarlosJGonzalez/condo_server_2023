@@ -11,27 +11,27 @@ class Users{
             for( var key in data ){
                 var token = data['token'];
             }
-//
-        if( !refreshTokens.includes( token ) ){
-            return callback({ status: 403, message: 'Unauthorized. You should do login.' });
-        };
-    
-        jwt.verify( token, JWT_REFRESH_TOKEN, (err, user ) => {
-            if( err ){
-                return callback({ status: 403, message: err });
-            }
-            const userJWT = {
-                id: user.userid,
-                name: user.username,
-                email: user.email,
-                role: 'admin'
-            };
 
-            const accessToken = jwt.sign( userJWT, JWT_KEY, { expiresIn: '20m' });
-            var resp = '{"refreshtoken":"' + accessToken + '"}';
-            return callback ({ "status": 200,  message: resp });
+            if( !refreshTokens.includes( token ) ){
+                return callback({ status: 403, message: 'Unauthorized. You should do login.' });
+            };
+        
+            jwt.verify( token, JWT_REFRESH_TOKEN, (err, user ) => {
+                if( err ){
+                    return callback({ status: 403, message: err });
+                }
+                const userJWT = {
+                    id: user.userid,
+                    name: user.username,
+                    email: user.email,
+                    role: 'admin'
+                };
+
+                const accessToken = jwt.sign( userJWT, JWT_KEY, { expiresIn: '20m' });
+                var resp = '{"refreshtoken":"' + accessToken + '"}';
+                return callback ({ "status": 200,  message: resp });
+            });
         });
-    });
     }
 
     async checkUserAccount( email, pwd, checkback ){
@@ -48,14 +48,16 @@ class Users{
          */
         var conn = require( '../helpers/conn' );
         var con = conn.newCon();
-        email = conn.escape( email );
-        pwd = conn.escape( pwd );
+    
+        if( !email || !pwd ){
+            return checkback({ status: 403, message: "Unauthorized. You should do login again"});
+        }
 
         con.connect( function( err ) {
             if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
         });
 
-        var sql = 'select `id`, `failure` from `users` where (`email`=' + email + ')';
+        var sql = 'select `id`, `failure` from `users` where (`email`="' + email + '")';
         con.query( sql, function( err, result ){
             if( err ){
                 con.end();
@@ -72,13 +74,14 @@ class Users{
                 /**********************************************
                  * The email exists; now check if the pwd match
                  */
-                sql = 'select `id`, `failure`, `active` from `users` where (`email`='+email+' and `pwd`='+pwd+')';
+                sql = 'select `id`, `failure`, `active` from `users` where (`email`="'+email+'" and `pwd`="'+pwd+'")';
+
                 con.query( sql, function( err, result ){
                     if( err ) {
                         con.end();
                         return checkback({ status:500, message: err['sqlMessage'] });
                     }
-                  
+                
                     if( result && result.length > 0 ){
                         con.end();
                         var active;
@@ -101,12 +104,12 @@ class Users{
                         });
 
                     }else{                  
-                       sql = "update `users` set `failure`=`failure` + 1 where `id`=" + id;
-                       con.query( sql, function( err, result ){
+                    sql = "update `users` set `failure`=`failure` + 1 where `id`=" + id;
+                    con.query( sql, function( err, result ){
                         if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
 
                         return checkback({ status: 404, message: 'Wrong Email or Password' });
-                       });
+                    });
                     }
                 });
 
@@ -119,16 +122,16 @@ class Users{
     async getUserId( email, pwd, callback ){
         var conn = require( '../helpers/conn' );
         var con = conn.newCon();
-        email = conn.escape( email );
-        pwd = conn.escape( pwd );
 
         con.connect( function( err ) {
             if( err ) return callback({ status: 500, message: err['sqlMessage'] });
         });
 
+        if( !email || !pwd ){
+            return checkback({ status: 403, message: "Unauthorized. You should do login again"});
+        }
         var sql = "select c.`id` condo_id, c.`condo_name`, c.`logo`, u.`name`, u.`email`, u.`id` user_id, u.`failure` from `condos` c inner join `condo_user` cu on c.`id` = cu.`id_condo` ";
-        sql += "inner join `users` u on cu.`id_user` = u.`id` and cu.id_user=(select `id` from `users` where(`email`="+email+" and `pwd`="+pwd+" and `active` = 1));";
-        
+        sql += "inner join `users` u on cu.`id_user` = u.`id` and cu.id_user=(select `id` from `users` where(`email`='"+email+"' and `pwd`='"+pwd+"' and `active` = 1));";
         con.query( sql, function( err, result ){
             con.end();
             if( err ){
