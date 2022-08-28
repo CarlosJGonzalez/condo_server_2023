@@ -79,6 +79,9 @@ app.post('/token', (req, res) => {
 			if( required.indexOf( field ) == -1 ){
 				res.status(400).send('A required field is missed.');
 				return;
+			}else if( required.indexOf( field ) > -1 && field == '' ){
+				res.status(400).send('A required field is missed.');
+				return;
 			}
 		}
 		var email = fields.email;
