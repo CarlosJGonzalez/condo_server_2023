@@ -35,7 +35,7 @@ class Periods_Details{
                         const body = err['sqlMessage'];
                         return callback( { status: 500, message: body } );
                     }else{
-                        var row = '';
+                        var row = '{"result":[';
                         result.forEach( function( value ) {
                             row = row + '{"id":' + value.id
                             +',"ext_key":' + value.ext_key
@@ -56,7 +56,11 @@ class Periods_Details{
                             +',"created_at":"' + value.created_at
                             +'"},'
                         });
-                        row = row.substring(0, row.length - 1);
+
+                        if( row.length > 2 ){
+                            row = row.substring(0, row.length - 1);
+                        }
+                        row += "]}";
                         return callback( { status: 200, message: row } );
                     }
                 });
