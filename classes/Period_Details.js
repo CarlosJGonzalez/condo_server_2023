@@ -81,6 +81,41 @@ class Periods_Details{
                 }
 
                 let sql = "select * from `period_details` where `id` = " + id;
+                con.query( sql, function( err, result ){
+                    con.end();
+                    if( err ){
+                        const body = err['sqlMessage'];
+                        return callback({ status: 500, message: body });
+                    }
+
+                    if( result && result.length > 0 ){
+                        var row='';
+                        result.forEach( function( value ){
+                            row = row + '{"id":' + value.id
+                            +',"ext_key":' + value.ext_key
+                            +',"exp_number":' + value.exp_number
+                            +',"id_exp":' + value.id_exp
+                            +',"code":"' + value.code
+                            +'","description":"' + value.description
+                            +'","unit":"' + value.unit
+                            +'","amount":"' + value.amount
+                            +'","id_provider":' + value.id_provider
+                            +',"provider":"' + value.id_provider
+                            +'","id_bank":' + value.id_bank
+                            +',"check_number":"' + value.check_number
+                            +'","invoice_number":"' + value.invoice_number
+                            +'","invoice_description":"' + value.invoice_description
+                            +'","kind":' + value.kind
+                            +',"id_unit":' + value.id_unit
+                            +',"created_at":"' + value.created_at
+                            +'"},'
+                        });
+                        if( row.length > 2 ){
+                            row = row.substring(0, row.length - 1);
+                        }
+                        return callback( { status: 200, message: row } );                        
+                    }
+                })
             })
         }catch( err ){
 

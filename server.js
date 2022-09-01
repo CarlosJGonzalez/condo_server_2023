@@ -98,6 +98,7 @@ app.post('/token', (req, res) => {
 			}, 
 			user.getUserId ( email, pwd, function( result ){
 				res.status( result.status ).send( result.message );
+				next();
 			})
 		);
 	});
@@ -119,6 +120,18 @@ app.get('/user/role/:id', function( req, res ){
 /******************** PERIOD DETAILS -->*************************/
 /****************************************************************/
 /** Get details for the giving Period ***************************/
+app.get('/period_detail/:id', authenticateJWT, function( req, res ){
+	let id = req.params.id;
+
+	const detailPeriods = require('./classes/Period_Details.js');
+	const detail = new detailPeriods();
+	detail.get( id, function( result){
+		res.status( result.status ).send( result.message );
+	});
+});
+
+
+
 app.get('/period_details/:idPeriod',  authenticateJWT, function( req, res ){
 	let idPeriod = req.params.idPeriod;
 	const detPeriods = require('./classes/Period_Details.js');
