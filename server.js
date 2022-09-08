@@ -366,12 +366,30 @@ const Group = require('./classes/Groups.js');
 const group = new Group();
 app.put('/group', authenticateJWT, function( req, res ){
 	var form = new formidable.IncomingForm();
-	group.put( form, req, function( result ){	
-		if( result.hasOwnProperty( 'id') ){
-			res.status( result.status ).send( { id: result.id });
-		}else{
-			res.status( result.status ).send( result.message );
+	if( !form ){
+		return res.sendStatus( 400 );		
+	}
+
+	form.parse( req, function( err, fields ) {
+		const required = [
+			'code',
+			'description',
+			'idcondo'
+		];
+		for( let field in fields ){
+			if( required.indexOf( field ) < 1 ){
+				res.status( 400 ).send( 'A required field is missed' );
+				return;
+			}
 		}
+
+		group.put( form, req, function( result ){	
+			if( result.hasOwnProperty( 'id') ){
+				res.status( result.status ).send( { id: result.id });
+			}else{
+				res.status( result.status ).send( result.message );
+			}
+		});
 	});
 });
 
