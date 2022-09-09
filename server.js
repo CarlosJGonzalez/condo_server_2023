@@ -377,7 +377,7 @@ app.put('/group', authenticateJWT, function( req, res ){
 			'idcondo'
 		];
 		for( let field in fields ){
-			if( required.indexOf( field ) < 1 ){
+			if( required.indexOf( field ) == -1 ){
 				res.status( 400 ).send( 'A required field is missed' );
 				return;
 			}
