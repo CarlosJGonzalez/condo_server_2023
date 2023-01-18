@@ -92,8 +92,7 @@ app.post('/token', (req, res) => {
 	
 		user.checkUserAccount( email, pwd, function( result ){
 				if( result.status != 200 ){
-					res.status( result.status ).send( result.message );
-					return next();
+					return res.status( result.status ).send( result.message );
 				}
 				next();
 			}, 
