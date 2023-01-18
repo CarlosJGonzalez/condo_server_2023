@@ -92,13 +92,14 @@ app.post('/token', (req, res) => {
 	
 		user.checkUserAccount( email, pwd, function( result ){
 				if( result.status != 200 ){
-					return res.status( result.status ).send( result.message );
+					res.status( result.status ).send( result.message );
+				}else{
+					user.getUserId ( email, pwd, function( result ){
+						res.status( result.status ).send( result.message );
+						next();
+					})
 				}
-			}, 
-			user.getUserId ( email, pwd, function( result ){
-				res.status( result.status ).send( result.message );
-				next();
-			})
+			}
 		);
 	});
 });
