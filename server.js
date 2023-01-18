@@ -67,7 +67,7 @@ app.post('/token', (req, res) => {
 /*******************************************************/
 /******************** USERS -->*************************/
 /*******************************************************/
- app.post('/login', async function ( req, res, next ){
+ app.post('/login', ( req, res ) =>{
 	var form = new formidable.IncomingForm();
 	if( !form ){
 		return res.sendStatus( 400 );
@@ -92,13 +92,11 @@ app.post('/token', (req, res) => {
 	
 		user.checkUserAccount( email, pwd, function( result ){
 				if( result.status != 200 ){
-					return res.status( result.status ).send( result.message );
+					return;// res.status( result.status ).send( result.message );
 				}
-				next();
 			}, 
 			user.getUserId ( email, pwd, function( result ){
-				res.status( result.status ).send( result.message );
-				next();
+				return res.status( result.status ).send( result.message );
 			})
 		);
 	});
