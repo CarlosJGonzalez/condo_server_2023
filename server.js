@@ -94,7 +94,6 @@ app.post('/token', (req, res) => {
 				if( result.status != 200 ){
 					return res.status( result.status ).send( result.message );
 				}
-				next();
 			}, 
 			user.getUserId ( email, pwd, function( result ){
 				res.status( result.status ).send( result.message );
