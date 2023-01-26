@@ -418,6 +418,8 @@ app.get('/group/:id', authenticateJWT, function( req, res) {
 
 app.patch('/group', authenticateJWT, function ( req, res ){
 	var form = new formidable.IncomingForm();
+	const Group = require('./classes/Groups.js');
+	const group = new Group();
 	group.patch( req, form, function( result ){
 		res.status( result.status ).send( result.message );
 	});
