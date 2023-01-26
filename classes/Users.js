@@ -8,7 +8,11 @@ class Users{
     refreshToken( req, form, callback ){
         
         form.parse( req, function( err, data ){
-            for( var key in data ){
+            const required = ['token'];
+            for( let field in data ){
+                if( required.indexOf( field ) == -1 ){
+                    return callback({ status: 400, message: 'Bad request.' });
+                }
                 var token = data['token'];
             }
 

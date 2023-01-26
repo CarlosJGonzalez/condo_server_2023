@@ -1,43 +1,39 @@
 class Groups{
 
-    async put( form, req, callback ){
+    async put( data, callback ){
 		try{
 			let conn = require('../helpers/conn'); 
 			var con = conn.newCon();
-
-			form.parse( req, function( err, data ){
-				let fields = '(', values = '(';
-				for( var key in data ){
-					fields +=  '`'+ key + '`,';
-					if( key === 'idcondo' ){
-						values += data[key] + ',';
-					}else{
-						values += conn.escape( data[key] ) + ',';
-					}
+			let fields = '(', values = '(';
+			for( var key in data ){
+				fields +=  '`'+ key + '`,';
+				if( key === 'idcondo' ){
+					values += data[key] + ',';
+				}else{
+					values += conn.escape( data[key] ) + ',';
 				}
-				let strValues = values.substring( 0, values.length - 1 );
-				let strFields = fields.substring( 0, fields.length - 1 );
-		
-				strFields += ')';
-				strValues += ')';
+			}
+			let strValues = values.substring( 0, values.length - 1 );
+			let strFields = fields.substring( 0, fields.length - 1 );
+	
+			strFields += ')';
+			strValues += ')';
+			
+			let strSql = 'insert into `codes` ' + strFields + ' values ' + strValues;
+			con.connect( function ( err ){
+				if( err ) {
+					return;// callback ({ status: 500, message: err['sqlMessage'] });
+				}
 				
-				let strSql = 'insert into `codes` ' + strFields + ' values ' + strValues;
-				con.connect( function ( err ){
-					if( err ) {
-						con.end();
-						return callback ({ status: 500, message: err['sqlMessage'] });
+				con.query( strSql, function( err, result ){					
+					con.end();
+					if( err ) {	
+						const body = err['sqlMessage'];
+						return callback ( { status: 500, message: body } );
 					}
-					
-					con.query( strSql, function( err, result ){					
-						con.end();
-						if( err ) {	
-							const body = err['sqlMessage'];
-							return callback ( { status: 500, message: body } );
-						}
-						return callback ({ status: 200, id: result.insertId });
-					});
+					return callback ({ status: 200, id: result.insertId });
 				});
-			})
+			});
 		}catch( err ){
 			return callback( { status: 500, message: 'Error at Groups Class, Put Method' } );
 		}

@@ -360,8 +360,6 @@ app.delete('/item/:id', authenticateJWT, function( req, res ) {
 /*********************************************************************/
 /************************** GROUPS -->*********************************/
 /*********************************************************************/
-const Group = require('./classes/Groups.js');
-const group = new Group();
 app.put('/group', authenticateJWT, function( req, res ){
 	var form = new formidable.IncomingForm();
 	if( !form ){
@@ -374,14 +372,23 @@ app.put('/group', authenticateJWT, function( req, res ){
 			'description',
 			'idcondo'
 		];
-		for( let field in fields ){
-			if( required.indexOf( field ) == -1 ){
-				res.status( 400 ).send( 'A required field is missed' );
-				return;
+		
+		for( let req in required ){
+			for( let field in fields ){
+				if( required[req] == field ){
+					required.splice( req, 1 );
+				}
 			}
 		}
 
-		group.put( form, req, function( result ){	
+		if( required.length > 0 ){
+			res.status( 400 ).send( 'A required field is missed' );
+			return;
+		}
+	
+		const Group = require('./classes/Groups.js');
+		const group = new Group();
+		group.put( fields, function( result ){
 			if( result.hasOwnProperty( 'id') ){
 				res.status( result.status ).send( { id: result.id });
 			}else{
@@ -391,8 +398,10 @@ app.put('/group', authenticateJWT, function( req, res ){
 	});
 });
 
-app.get('/groups', authenticateJWT, function( req, res){
-	var idcondo=1;//TO DO 
+app.get('/groups/:idcondo', authenticateJWT, function( req, res){
+	const Group = require('./classes/Groups.js');
+	const group = new Group();
+	var idcondo=req.params.idcondo;
 	group.browse( idcondo, function( result ){
 		res.status( result.status ).send( result.message );
 	});
@@ -400,6 +409,8 @@ app.get('/groups', authenticateJWT, function( req, res){
 
 app.get('/group/:id', authenticateJWT, function( req, res) {
 	let id = req.params.id;
+	const Group = require('./classes/Groups.js');
+	const group = new Group();
 	group.get( id, function( result ){
 		res.status( result.status ).send( result.message );
 	});
@@ -415,6 +426,8 @@ app.patch('/group', authenticateJWT, function ( req, res ){
 
 app.delete('/group/:id', authenticateJWT, function( req, res ){
 	let id = req.params.id;
+	const Group = require('./classes/Groups.js');
+	const group = new Group();
 	group.del( id, function( result ){
 		res.status( result.status ).send( result.message );
 	});
