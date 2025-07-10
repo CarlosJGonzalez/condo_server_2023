@@ -32,7 +32,7 @@ const authenticateJWT = ( req, res, next ) => {
 };
 
 
-app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:8081', '*'] }));
+app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:3000', '*'] }));
 require('dotenv').config();
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -106,7 +106,7 @@ app.post('/token', (req, res) => {
 
 
 
-app.get('/user/role/:id', function( req, res ){
+app.get('/user/role/:id', authenticateJWT,function( req, res ){
 	let id = req.params.id;
 	const User = require('./classes/Users.js');
 	const user = new User();
@@ -464,7 +464,7 @@ app.delete('/condo/:id', function( req, res){
 })
 
 /** patching **/
-app.patch('/condo/:id',  function( req, res){
+app.patch('/condo/:id', authenticateJWT, function( req, res){
 	var form = new formidable.IncomingForm();
 	const Condos = require('./classes/Condos.js');	
 	const condo = new Condos();
