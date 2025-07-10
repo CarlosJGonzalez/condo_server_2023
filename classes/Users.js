@@ -128,7 +128,7 @@ class Users{
         });
 
         if( !email || !pwd ){
-            return checkback({ status: 403, message: "Unauthorized. You should do login again"});
+            return callback({ status: 403, message: "Unauthorized. You should do login again"});
         }
         var sql = "select c.`id` condo_id, c.`condo_name`, c.`logo`, u.`name`, u.`email`, u.`id` user_id, u.`failure` from `condos` c inner join `condo_user` cu on c.`id` = cu.`id_condo` ";
         sql += "inner join `users` u on cu.`id_user` = u.`id` and cu.id_user=(select `id` from `users` where(`email`='"+email+"' and `pwd`='"+pwd+"' and `active` = 1));";
