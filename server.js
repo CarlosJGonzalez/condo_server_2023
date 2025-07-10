@@ -32,7 +32,7 @@ const authenticateJWT = ( req, res, next ) => {
 };
 
 
-app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:3000', 'https://spa.parguitog.com'] }));
+app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:3000', 'https://spa.parguitog.com', 'https://spa.myrecp.com'] }));
 require('dotenv').config();
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
