@@ -63,15 +63,11 @@ app.post('/token', (req, res) => {
 	});
 });
 
- app.post('/login', (req, res) => {
-  console.log(req.body);
-  res.send('Logged in');
-});
 
 /*******************************************************/
 /******************** USERS -->*************************/
 /*******************************************************/
- app.post('/loginXX', async function ( req, res, next ){
+ app.post('/login', ( req, res, next )=> {
 	var form = new formidable.IncomingForm();
 	if( !form ){
 		return res.sendStatus( 400 );
