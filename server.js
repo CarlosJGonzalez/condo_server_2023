@@ -1,4 +1,4 @@
-const express = require('express').Router();
+const express = require('express');
 const app = express();
 const cors = require("cors");
 const CondoEmail = require('./classes/CondoEmail.js');
@@ -63,11 +63,15 @@ app.post('/token', (req, res) => {
 	});
 });
 
- 
+ app.post('/login', (req, res) => {
+  console.log(req.body);
+  res.send('Logged in');
+});
+
 /*******************************************************/
 /******************** USERS -->*************************/
 /*******************************************************/
- app.post('/login', async function ( req, res, next ){
+ app.post('/loginXX', async function ( req, res, next ){
 	var form = new formidable.IncomingForm();
 	if( !form ){
 		return res.sendStatus( 400 );
