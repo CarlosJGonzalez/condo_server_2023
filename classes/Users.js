@@ -34,7 +34,7 @@ class Users{
         });
     }
 
-    async checkUserAccount( email, pwd, checkback ){
+    async checkUserAccount( email, pwd, callback ){
         /*****************************************************
          * 1 - Check if the email exists => take: id, failure
             * 1.1 - Checking if pwd match: 

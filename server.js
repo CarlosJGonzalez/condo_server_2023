@@ -91,7 +91,7 @@ app.post('/token', (req, res) => {
 		const user = new Login();
 	
 		user.checkUserAccount( email, pwd, function( result ){
-			console.log( 'result 1:' + result );
+			console.log( 'result 2:' + result );
 				if( result.status != 200 ){
 					res.status( result.status ).send( result.message );
 					return;
@@ -99,7 +99,7 @@ app.post('/token', (req, res) => {
 				next();
 			}, 
 			user.getUserId ( email, pwd, function( result ){
-				console.log('result 2:' + result);
+				console.log('result 1:' + result);
 				res.status( result.status ).send( result.message );
 				next();
 			})
