@@ -86,7 +86,7 @@ app.post('/token', (req, res) => {
 		}
 		var email = fields.email;
 		var pwd = fields.pwd;
-
+console.log( fields );
 		const Login = require('./classes/Users.js');
 		const user = new Login();
 	
