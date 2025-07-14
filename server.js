@@ -89,8 +89,9 @@ app.post('/token', (req, res) => {
 console.log( fields );
 		const Login = require('./classes/Users.js');
 		const user = new Login();
-	
+	console.log( user );
 		user.checkUserAccount( email, pwd, function( result ){
+			console.log( 'result 1:' + result );
 				if( result.status != 200 ){
 					res.status( result.status ).send( result.message );
 					return;
@@ -98,6 +99,7 @@ console.log( fields );
 				next();
 			}, 
 			user.getUserId ( email, pwd, function( result ){
+				console.log('result 2:' + result);
 				res.status( result.status ).send( result.message );
 				next();
 			})
