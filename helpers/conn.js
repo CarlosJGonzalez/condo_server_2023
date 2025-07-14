@@ -1,6 +1,6 @@
-var mysql = require('mysql');
+import { createConnection, escape as __escape } from 'mysql';
 function newCon(){
-    var con = mysql.createConnection
+    var con = createConnection
     ({
         host: process.env.host,
         user: process.env.user,
@@ -12,8 +12,10 @@ function newCon(){
 
 
 function escape( param ){
-    return mysql.escape( param );
+    return __escape( param );
 }
 
-module.exports.newCon = newCon;
-module.exports.escape = escape;
+const _newCon = newCon;
+export { _newCon as newCon };
+const _escape = escape;
+export { _escape as escape };
