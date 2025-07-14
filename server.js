@@ -32,7 +32,7 @@ const authenticateJWT = ( req, res, next ) => {
 };
 
 
-app.use(cors({ origin: ['https://condo-online.herokuapp.com','http://localhost:3000', 'https://spa.parguitog.com', 'https://spa.myrecp.com'] }));
+app.use(cors({ origin: ['http://localhost:3000', 'https://spa.parguitog.com', 'https://spa.myrecp.com'] }));
 require('dotenv').config();
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -86,25 +86,24 @@ app.post('/token', (req, res) => {
 		}
 		var email = fields.email;
 		var pwd = fields.pwd;
-	console.log( fields );
+
 		const Login = require('./classes/Users.js');
 		const user = new Login();
 	
 		user.checkUserAccount( email, pwd, function( result ){
-			console.log( 'result 2:' + result.message );
+			//console.log( 'result 2:' + result.message );
 				if( result.status != 200 ){
-					//res.status( result.status ).send( result.message );
+					res.status( result.status ).send( result.message );
 					return;
 				}
 				next();
-			}
+			}, 
+			user.getUserId ( email, pwd, function( result ){
+				//console.log('result 1:' + result.message);
+				res.status( result.status ).send( result.message );
+				next();
+			})
 		);
-		// 	user.getUserId ( email, pwd, function( result ){
-		// 		console.log('result 1:' + result.message);
-		// 		//res.status( result.status ).send( result.message );
-		// 		next();
-		// 	})
-		// );
 	});
 });
 

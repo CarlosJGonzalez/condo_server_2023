@@ -35,7 +35,6 @@ class Users{
     }
 
     async checkUserAccount( email, pwd, checkback ){
-        console.log( email + ' ' + pwd );
         /*****************************************************
          * 1 - Check if the email exists => take: id, failure
             * 1.1 - Checking if pwd match: 
@@ -65,7 +64,7 @@ class Users{
                     con.end();
                     return checkback({ status: 500, message: err});
                 }
-console.log( 'result=' + result );
+
                 if( result && result.length > 0 ){
                     var id, failure;
                     result.forEach( function( row ){
@@ -106,12 +105,12 @@ console.log( 'result=' + result );
                             });
 
                         }else{                  
-                        sql = "update `users` set `failure`=`failure` + 1 where `id`=" + id;
-                        con.query( sql, function( err, result ){
-                            if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
+                            sql = "update `users` set `failure`=`failure` + 1 where `id`=" + id;
+                            con.query( sql, function( err, result ){
+                                if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
 
-                            return checkback({ status: 404, message: 'Wrong Email or Password' });
-                        });
+                                return checkback({ status: 404, message: 'Wrong Email or Password' });
+                            });
                         }
                     });
 
