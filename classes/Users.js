@@ -48,7 +48,7 @@ class Users{
          * 2 - 
          */
         try{
-            var conn = require( '../helpers/conn' );
+            var conn = require( '../helpers/conn.js' );
             var con = conn.newCon();
         
             if( !email || !pwd ){
