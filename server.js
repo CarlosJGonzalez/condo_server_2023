@@ -67,7 +67,7 @@ app.post('/token', (req, res) => {
 /*******************************************************/
 /******************** USERS -->*************************/
 /*******************************************************/
- app.post('/login', ( req, res, next )=> {
+ app.post('/login', ( req, res )=> {
 	var form = new formidable.IncomingForm();
 	if( !form ){
 		return res.sendStatus( 400 );
