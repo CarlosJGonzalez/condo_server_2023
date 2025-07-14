@@ -120,52 +120,57 @@ class Users{
     }
 
     async getUserId( email, pwd, callback ){
-        var conn = require( '../helpers/conn' );
-        var con = conn.newCon();
+        try{
+            var conn = require( '../helpers/conn' );
+            var con = conn.newCon();
 
-        con.connect( function( err ) {
-            if( err ) return callback({ status: 500, message: err['sqlMessage'] });
-        });
+            con.connect( function( err ) {
+                if( err ) return callback({ status: 500, message: err['sqlMessage'] });
+            });
 
-        if( !email || !pwd ){
-            return callback({ status: 403, message: "Unauthorized. You should do login again"});
+            if( !email || !pwd ){
+                return callback({ status: 403, message: "Unauthorized. You should do login again"});
+            }
+            var sql = "select c.`id` condo_id, c.`condo_name`, c.`logo`, u.`name`, u.`email`, u.`id` user_id, u.`failure` from `condos` c inner join `condo_user` cu on c.`id` = cu.`id_condo` ";
+            sql += "inner join `users` u on cu.`id_user` = u.`id` and cu.id_user=(select `id` from `users` where(`email`='"+email+"' and `pwd`='"+pwd+"' and `active` = 1));";
+            con.query( sql, function( err, result ){
+                con.end();
+                if( err ){
+                    return callback({ status:500, message: err['sqlMessage'] });
+                }
+
+                var user = null;
+                var uId = null;
+                if( result && result.length > 0){
+                    const userJWT = {
+                        id: result.user_id,
+                        name: result.name,
+                        email: email,
+                        role: 'admin'
+                    };
+                    const token = jwt.sign( userJWT, process.env.JWT_KEY, { expiresIn: '20m' } );
+                    const refreshToken = jwt.sign( userJWT, process.env.JWT_REFRESH_TOKEN );
+                    refreshTokens.push( refreshToken );
+
+                    result.forEach(function(row) {
+                        uId = row.id;
+                        user = '{"condo_id":' + row.condo_id+
+                            ',"condo_name":"'+row.condo_name+
+                            '","user_id":'+row.user_id+
+                            ',"email":"'+row.email+
+                            '","user_name":"'+row.name+
+                            '","token":"' +token+
+                            '","refreshToken":"' +refreshToken+
+                        '"}';
+                    });
+                    return callback({ status:200, message: user });
+                }
+                return callback({ status: 404, message: 'User Not Found!' });
+            });
+        }catch( error ){
+            return callback({status: 500, message: error })
         }
-        var sql = "select c.`id` condo_id, c.`condo_name`, c.`logo`, u.`name`, u.`email`, u.`id` user_id, u.`failure` from `condos` c inner join `condo_user` cu on c.`id` = cu.`id_condo` ";
-        sql += "inner join `users` u on cu.`id_user` = u.`id` and cu.id_user=(select `id` from `users` where(`email`='"+email+"' and `pwd`='"+pwd+"' and `active` = 1));";
-        con.query( sql, function( err, result ){
-            con.end();
-            if( err ){
-                return callback({ status:500, message: err['sqlMessage'] });
-            }
 
-            var user = null;
-            var uId = null;
-            if( result && result.length > 0){
-                const userJWT = {
-                    id: result.user_id,
-                    name: result.name,
-                    email: email,
-                    role: 'admin'
-                };
-                const token = jwt.sign( userJWT, process.env.JWT_KEY, { expiresIn: '20m' } );
-                const refreshToken = jwt.sign( userJWT, process.env.JWT_REFRESH_TOKEN );
-                refreshTokens.push( refreshToken );
-
-                result.forEach(function(row) {
-                    uId = row.id;
-                    user = '{"condo_id":' + row.condo_id+
-                        ',"condo_name":"'+row.condo_name+
-                        '","user_id":'+row.user_id+
-                        ',"email":"'+row.email+
-                        '","user_name":"'+row.name+
-                        '","token":"' +token+
-                        '","refreshToken":"' +refreshToken+
-                    '"}';
-                });
-                return callback({ status:200, message: user });
-            }
-            return callback({ status: 404, message: 'User Not Found!' });
-        });
     }
 
     async getRole( id, callback ){
