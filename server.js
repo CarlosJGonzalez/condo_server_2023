@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require('express').Router();
 const app = express();
 const cors = require("cors");
 const CondoEmail = require('./classes/CondoEmail.js');
