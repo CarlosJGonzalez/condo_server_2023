@@ -46,77 +46,82 @@ class Users{
             *          else failure++
          * 2 - 
          */
-        var conn = require( '../helpers/conn' );
-        var con = conn.newCon();
-    
-        if( !email || !pwd ){
-            return checkback({ status: 403, message: "Unauthorized. You should do login again"});
+        try{
+            var conn = require( '../helpers/conn' );
+            var con = conn.newCon();
+        
+            if( !email || !pwd ){
+                return checkback({ status: 403, message: "Unauthorized. You should do login again"});
+            }
+
+            con.connect( function( err ) {
+                if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
+            });
+
+            var sql = 'select `id`, `failure` from `users` where (`email`="' + email + '")';
+            con.query( sql, function( err, result ){
+                if( err ){
+                    con.end();
+                    return checkback({ status: 500, message: err['sqlMessage'] });
+                }
+
+                if( result && result.length > 0 ){
+                    var id, failure;
+                    result.forEach( function( row ){
+                        id = row.id;
+                        failure = row.failure;
+                    });
+
+                    /**********************************************
+                     * The email exists; now check if the pwd match
+                     */
+                    sql = 'select `id`, `failure`, `active` from `users` where (`email`="'+email+'" and `pwd`="'+pwd+'")';
+
+                    con.query( sql, function( err, result ){
+                        if( err ) {
+                            con.end();
+                            return checkback({ status:500, message: err['sqlMessage'] });
+                        }
+                    
+                        if( result && result.length > 0 ){
+                            con.end();
+                            var active;
+                            result.forEach( function( row ){
+                                active = row.active;
+                            });
+
+                            if( active == 0 ) return checkback({ status: 401, message: 'Account blocked. Too many login intents. Try again in 15 minutes.' });
+
+                            return checkback({ status: 200, message: 'success' });
+
+                        }else if( parseInt( failure ) > 2 ){
+                            sql = 'update `users` set `active` = 0 where `id`=' + id;
+                            con.query( sql, function( err, result){
+                                con.end();
+                                if( err ){
+                                    return checkback({ status: 500, message: err['sqlMessage'] });
+                                }
+                                return checkback({ status: 401, message: "Account blocked. Too many login intents. Try again in 15 minutes." });
+                            });
+
+                        }else{                  
+                        sql = "update `users` set `failure`=`failure` + 1 where `id`=" + id;
+                        con.query( sql, function( err, result ){
+                            if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
+
+                            return checkback({ status: 404, message: 'Wrong Email or Password' });
+                        });
+                        }
+                    });
+
+                }else{             
+                    return checkback({ status: 401, message: 'Wrong email or password' });
+                }
+            });
+        }catch( error ){
+            return checkback({ status: 500, message: error } );
         }
 
-        con.connect( function( err ) {
-            if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
-        });
-
-        var sql = 'select `id`, `failure` from `users` where (`email`="' + email + '")';
-        con.query( sql, function( err, result ){
-            if( err ){
-                con.end();
-                return checkback({ status: 500, message: err['sqlMessage'] });
-            }
-
-            if( result && result.length > 0 ){
-                var id, failure;
-                result.forEach( function( row ){
-                    id = row.id;
-                    failure = row.failure;
-                });
-
-                /**********************************************
-                 * The email exists; now check if the pwd match
-                 */
-                sql = 'select `id`, `failure`, `active` from `users` where (`email`="'+email+'" and `pwd`="'+pwd+'")';
-
-                con.query( sql, function( err, result ){
-                    if( err ) {
-                        con.end();
-                        return checkback({ status:500, message: err['sqlMessage'] });
-                    }
-                
-                    if( result && result.length > 0 ){
-                        con.end();
-                        var active;
-                        result.forEach( function( row ){
-                            active = row.active;
-                        });
-
-                        if( active == 0 ) return checkback({ status: 401, message: 'Account blocked. Too many login intents. Try again in 15 minutes.' });
-
-                        return checkback({ status: 200, message: 'success' });
-
-                    }else if( parseInt( failure ) > 2 ){
-                        sql = 'update `users` set `active` = 0 where `id`=' + id;
-                        con.query( sql, function( err, result){
-                            con.end();
-                            if( err ){
-                                return checkback({ status: 500, message: err['sqlMessage'] });
-                            }
-                            return checkback({ status: 401, message: "Account blocked. Too many login intents. Try again in 15 minutes." });
-                        });
-
-                    }else{                  
-                    sql = "update `users` set `failure`=`failure` + 1 where `id`=" + id;
-                    con.query( sql, function( err, result ){
-                        if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
-
-                        return checkback({ status: 404, message: 'Wrong Email or Password' });
-                    });
-                    }
-                });
-
-            }else{             
-                return checkback({ status: 401, message: 'Wrong email or password' });
-            }
-        });
     }
 
     async getUserId( email, pwd, callback ){

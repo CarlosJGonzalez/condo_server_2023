@@ -86,10 +86,10 @@ app.post('/token', (req, res) => {
 		}
 		var email = fields.email;
 		var pwd = fields.pwd;
-console.log( fields );
+	console.log( fields );
 		const Login = require('./classes/Users.js');
 		const user = new Login();
-	console.log( user );
+	
 		user.checkUserAccount( email, pwd, function( result ){
 			console.log( 'result 1:' + result );
 				if( result.status != 200 ){
