@@ -444,7 +444,7 @@ app.put('/condo', authenticateJWT, function( req, res ){
 // 	console.log( 'browsing - listing condos' );
 // })
 
-app.get('/condo/:id', authenticateJWT, function( req, res){
+app.get('/condo/:id', function( req, res){
 	let id = req.params.id;
 	const Condos = require('./classes/Condos.js');	
 	const condo = new Condos();	
