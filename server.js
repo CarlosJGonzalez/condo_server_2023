@@ -96,12 +96,12 @@ app.post('/token', (req, res) => {
 					//res.status( result.status ).send( result.message );
 					return;
 				}
-				next();
+				//next();
 			}, 
 			user.getUserId ( email, pwd, function( result ){
 				//console.log('result 1:' + result.message);
 				//res.status( result.status ).send( result.message );
-				next();
+				//next();
 			})
 		);
 	});
