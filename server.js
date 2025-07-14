@@ -530,4 +530,4 @@ app.post('/contact', function (req, res ){
 //var port = 80;
 const port = process.env.PORT || 5000;
 app.listen(port);
-console.log('running at '+ port);
+console.log('Condo server is running at '+ port);

@@ -55,14 +55,14 @@ class Users{
             }
 
             con.connect( function( err ) {
-                if( err ) return checkback({ status: 500, message: err['sqlMessage'] });
+                if( err ) return checkback({ status: 500, message: err });
             });
 
             var sql = 'select `id`, `failure` from `users` where (`email`="' + email + '")';
             con.query( sql, function( err, result ){
                 if( err ){
                     con.end();
-                    return checkback({ status: 500, message: err['sqlMessage'] });
+                    return checkback({ status: 500, message: err});
                 }
 
                 if( result && result.length > 0 ){
@@ -80,7 +80,7 @@ class Users{
                     con.query( sql, function( err, result ){
                         if( err ) {
                             con.end();
-                            return checkback({ status:500, message: err['sqlMessage'] });
+                            return checkback({ status:500, message: err });
                         }
                     
                         if( result && result.length > 0 ){
