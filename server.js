@@ -63,11 +63,47 @@ app.post('/token', (req, res) => {
 	});
 });
 
+ app.post('/loginnew', (req, res) => {
+	console.log('line 67');
+	var form = new formidable.IncomingForm();
+	if( !form ){
+		return res.sendStatus( 400 );
+	}	
+	form.parse( req, function( err, fields ){
+		const required = ['email', 'pwd'];
+		for( let field in fields ){
+			if( required.indexOf( field ) == -1 ){
+				res.status(400).send('A required field is missed.');
+				return;
+			}else if( required.indexOf( field ) > -1 && field == '' ){
+				res.status(400).send('A required field is missed.');
+				return;
+			}
+		}
+		var email = fields.email;
+		var pwd = fields.pwd;
+
+		const Login = require('./classes/Users.js');
+		const user = new Login();
+		user.checkUserAccount( email, pwd, function( result ){
+			//console.log( 'result 2:' + result.message );
+				if( result.status != 200 ){
+					console.log( result.status );
+					//res.status( result.status ).send( result.message );
+					return;
+				}else{
+					console.log( result );
+					res.status( result.status).send(result.message);
+				}
+			}
+		);		
+	});
+});
 
 /*******************************************************/
 /******************** USERS -->*************************/
 /*******************************************************/
- app.post('/login', ( req, res )=> {
+ app.post('/login', async function ( req, res, next ){
 	var form = new formidable.IncomingForm();
 	if( !form ){
 		return res.sendStatus( 400 );
@@ -96,12 +132,12 @@ app.post('/token', (req, res) => {
 					//res.status( result.status ).send( result.message );
 					return;
 				}
-				//next();
+				next();
 			}, 
 			user.getUserId ( email, pwd, function( result ){
 				//console.log('result 1:' + result.message);
-				//res.status( result.status ).send( result.message );
-				//next();
+				res.status( result.status ).send( result.message );
+				next();
 			})
 		);
 	});
