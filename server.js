@@ -8,13 +8,15 @@ const authenticateJWT = ( req, res, next ) => {
 	const authHeader = req.headers.authorization;
 	var tokenParts = null;
 	if( authHeader ){
-		tokenParts = authHeader.split(" ");
+		tokenParts = authHeader.split(",");
+		tokenParts = tokenParts[0].split(" ");
 	}
-
-	if( tokenParts && tokenParts[0] === "Bearer" && tokenParts[1].match(/\S+\.\S+\.\S+/) !== null ){
+	
+	if( tokenParts && tokenParts[0] == "Bearer" && tokenParts[1].match(/\S+\.\S+\.\S+/) !== null ){
 		try{
 			jwt.verify( tokenParts[1], process.env.JWT_KEY, ( err, user )=> {
 				if( err ){
+					console.log( err );
 					return res.sendStatus( 401 );
 				}
 
@@ -23,6 +25,7 @@ const authenticateJWT = ( req, res, next ) => {
 			});
 
 		} catch ( error ){
+			console.log( error );
 			res.status( 401 ).json({success: false, message: 'User Not Authenticated'});
 			return next( {success: false, message: 'User Not Authenticated'} );
 		}
@@ -278,7 +281,7 @@ app.get('/unit/:id', authenticateJWT, async function ( req, res ){
 	});
 });
 
-app.get('/units/:idcondo', function ( req, res ){
+app.get('/units/:idcondo', authenticateJWT, function ( req, res ){
 	let idcondo = req.params.idcondo;
 	const Unit = require('./classes/Units.js');
 	const unit = new Unit();
@@ -445,7 +448,7 @@ app.put('/condo', authenticateJWT, function( req, res ){
 // 	console.log( 'browsing - listing condos' );
 // })
 
-app.get('/condo/:id', function( req, res){
+app.get('/condo/:id', authenticateJWT, function( req, res){
 	let id = req.params.id;
 	const Condos = require('./classes/Condos.js');	
 	const condo = new Condos();	
