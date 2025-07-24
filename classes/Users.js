@@ -10,7 +10,7 @@ class Users{
         form.parse( req, function( err, data ){
             for( var key in data ){
                 var token = data['token'];
-            }
+            } 
         
             jwt.verify( token, JWT_REFRESH_TOKEN, (err, user ) => {
                 if( err ){
