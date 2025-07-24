@@ -32,7 +32,7 @@ const authenticateJWT = ( req, res, next ) => {
 };
 
 
-app.use(cors({ origin: ['http://localhost:3000', 'https://spa.parguitog.com', 'https://spa.myrecp.com'] }));
+app.use(cors({ origin: ['http://localhost:3000', 'https://spa.parguitog.com', 'https://spa.myrecp.com', '*'] }));
 require('dotenv').config();
 app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -63,47 +63,12 @@ app.post('/token', (req, res) => {
 	});
 });
 
- app.post('/loginnew', (req, res) => {
-	console.log('line 67');
-	var form = new formidable.IncomingForm();
-	if( !form ){
-		return res.sendStatus( 400 );
-	}	
-	form.parse( req, function( err, fields ){
-		const required = ['email', 'pwd'];
-		for( let field in fields ){
-			if( required.indexOf( field ) == -1 ){
-				res.status(400).send('A required field is missed.');
-				return;
-			}else if( required.indexOf( field ) > -1 && field == '' ){
-				res.status(400).send('A required field is missed.');
-				return;
-			}
-		}
-		var email = fields.email;
-		var pwd = fields.pwd;
 
-		const Login = require('./classes/Users.js');
-		const user = new Login();
-		user.checkUserAccount( email, pwd, function( result ){
-			//console.log( 'result 2:' + result.message );
-				if( result.status != 200 ){
-					console.log( result.status );
-					//res.status( result.status ).send( result.message );
-					return;
-				}else{
-					console.log( result );
-					res.status( result.status).send(result.message);
-				}
-			}
-		);		
-	});
-});
 
 /*******************************************************/
 /******************** USERS -->*************************/
 /*******************************************************/
- app.post('/login', async function ( req, res, next ){
+app.post('/login', async function ( req, res, next ){
 	var form = new formidable.IncomingForm();
 	if( !form ){
 		return res.sendStatus( 400 );
@@ -313,7 +278,7 @@ app.get('/unit/:id', authenticateJWT, async function ( req, res ){
 	});
 });
 
-app.get('/units/:idcondo', authenticateJWT, function ( req, res ){
+app.get('/units/:idcondo', function ( req, res ){
 	let idcondo = req.params.idcondo;
 	const Unit = require('./classes/Units.js');
 	const unit = new Unit();
