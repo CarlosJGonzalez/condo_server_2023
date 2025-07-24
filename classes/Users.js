@@ -11,10 +11,6 @@ class Users{
             for( var key in data ){
                 var token = data['token'];
             }
-
-            if( !refreshTokens.includes( token ) ){
-                return callback({ status: 403, message: 'Unauthorized. You should do login.' });
-            };
         
             jwt.verify( token, JWT_REFRESH_TOKEN, (err, user ) => {
                 if( err ){
@@ -153,7 +149,7 @@ class Users{
                         email: email,
                         role: 'admin'
                     };
-                    const token = jwt.sign( userJWT, process.env.JWT_KEY, { expiresIn: '20m' } );
+                    const token = jwt.sign( userJWT, process.env.JWT_KEY, { expiresIn: '-1' } );
                     const refreshToken = jwt.sign( userJWT, process.env.JWT_REFRESH_TOKEN );
                     refreshTokens.push( refreshToken );
 

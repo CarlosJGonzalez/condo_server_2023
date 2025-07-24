@@ -16,7 +16,6 @@ const authenticateJWT = ( req, res, next ) => {
 		try{
 			jwt.verify( tokenParts[1], process.env.JWT_KEY, ( err, user )=> {
 				if( err ){
-					console.log( err );
 					return res.sendStatus( 401 );
 				}
 
@@ -25,7 +24,6 @@ const authenticateJWT = ( req, res, next ) => {
 			});
 
 		} catch ( error ){
-			console.log( error );
 			res.status( 401 ).json({success: false, message: 'User Not Authenticated'});
 			return next( {success: false, message: 'User Not Authenticated'} );
 		}
@@ -529,6 +527,21 @@ app.post('/contact', function (req, res ){
 /*********************************************************************/
 /**************************<-- CONTACT *******************************/
 /*********************************************************************/
+
+
+/*********************************************************************/
+/************************** MARKETSTACK -->***************************/
+/*********************************************************************/
+app.get('/mkstak/eod', authenticateJWT, async function( req, res ){
+	//https://api.marketstack.com/v1/tickers?access_key=0f7d3506fa8995f146c02f4e40bd63e4&symbols=AAPL
+	//https://api.marketstack.com/v1/exchanges?access_key=0f7d3506fa8995f146c02f4e40bd63e4&symbols=AAPL
+	const eodurl = 'https://api.marketstack.com/v1/eod?access_key=0f7d3506fa8995f146c02f4e40bd63e4&symbols=AAPL';
+	const response = await fetch( eodurl );
+	const result = await response.json();
+	console.log( result );
+	res.status( 200 ).send( result.data );
+})
+
 
 
 //var port = 80;
