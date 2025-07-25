@@ -532,7 +532,7 @@ app.post('/contact', function (req, res ){
 /*********************************************************************/
 /************************** MARKETSTACK -->***************************/
 /*********************************************************************/
-app.get('/mkstack/eod', authenticateJWT, async function( req, res ){
+app.get('/mkstack/eod', async function( req, res ){
 	//https://api.marketstack.com/v1/tickers?access_key=0f7d3506fa8995f146c02f4e40bd63e4&symbols=AAPL
 	//https://api.marketstack.com/v1/exchanges?access_key=0f7d3506fa8995f146c02f4e40bd63e4&symbols=AAPL
 
