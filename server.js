@@ -16,6 +16,7 @@ const authenticateJWT = ( req, res, next ) => {
 		try{
 			jwt.verify( tokenParts[1], process.env.JWT_KEY, ( err, user )=> {
 				if( err ){
+					console.log( err );
 					return res.sendStatus( 401 );
 				}
 
@@ -532,359 +533,42 @@ app.post('/contact', function (req, res ){
 /*********************************************************************/
 /************************** MARKETSTACK -->***************************/
 /*********************************************************************/
-app.get('/mkstack/eod', async function( req, res ){
-	//https://api.marketstack.com/v1/tickers?access_key=0f7d3506fa8995f146c02f4e40bd63e4&symbols=AAPL
-	//https://api.marketstack.com/v1/exchanges?access_key=0f7d3506fa8995f146c02f4e40bd63e4&symbols=AAPL
-
-	const eodurl = 'https://api.marketstack.com/v1/eod?access_key=0f7d3506fa8995f146c02f4e40bd63e4&symbols=AAPL&limit=20';
-	const response = await fetch( eodurl );
-	const result = await response.json();
-	
-	/*const result = [
-		{
-			"open": 213.9,
-			"high": 215.69,
-			"low": 213.53,
-			"close": 213.76,
-			"volume": 45773373,
-			"adj_high": 215.69,
-			"adj_low": 213.53,
-			"adj_close": 213.76,
-			"adj_open": 213.9,
-			"adj_volume": 46022620,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-24T00:00:00+0000"
-		},
-		{
-			"open": 215.045,
-			"high": 215.1,
-			"low": 212.41,
-			"close": 214.15,
-			"volume": 46415026,
-			"adj_high": 215.15,
-			"adj_low": 212.41,
-			"adj_close": 214.15,
-			"adj_open": 215,
-			"adj_volume": 46989301,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-23T00:00:00+0000"
-		},
-		{
-			"open": 213.14,
-			"high": 214.95,
-			"low": 212.23,
-			"close": 214.4,
-			"volume": 46300400,
-			"adj_high": 214.95,
-			"adj_low": 212.2301,
-			"adj_close": 214.4,
-			"adj_open": 213.14,
-			"adj_volume": 46404072,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-22T00:00:00+0000"
-		},
-		{
-			"open": 212.05,
-			"high": 215.78,
-			"low": 211.6409,
-			"close": 212.48,
-			"volume": 51064253,
-			"adj_high": 215.78,
-			"adj_low": 211.63,
-			"adj_close": 212.48,
-			"adj_open": 212.1,
-			"adj_volume": 51377434,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-21T00:00:00+0000"
-		},
-		{
-			"open": 210.87,
-			"high": 211.79,
-			"low": 209.7,
-			"close": 211.18,
-			"volume": 48939500,
-			"adj_high": 211.79,
-			"adj_low": 209.7045,
-			"adj_close": 211.18,
-			"adj_open": 210.87,
-			"adj_volume": 48974591,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-18T00:00:00+0000"
-		},
-		{
-			"open": 210.625,
-			"high": 211.8,
-			"low": 209.59,
-			"close": 210.02,
-			"volume": 47738194,
-			"adj_high": 211.8,
-			"adj_low": 209.59,
-			"adj_close": 210.02,
-			"adj_open": 210.57,
-			"adj_volume": 48068141,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-17T00:00:00+0000"
-		},
-		{
-			"open": 210.29,
-			"high": 212.4,
-			"low": 208.64,
-			"close": 210.16,
-			"volume": 47148580,
-			"adj_high": 212.4,
-			"adj_low": 208.64,
-			"adj_close": 210.16,
-			"adj_open": 210.295,
-			"adj_volume": 47490532,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-16T00:00:00+0000"
-		},
-		{
-			"open": 209.15,
-			"high": 211.89,
-			"low": 208.92,
-			"close": 209.11,
-			"volume": 42071894,
-			"adj_high": 211.89,
-			"adj_low": 208.92,
-			"adj_close": 209.11,
-			"adj_open": 209.22,
-			"adj_volume": 42296339,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-15T00:00:00+0000"
-		},
-		{
-			"open": 209.909,
-			"high": 210.91,
-			"low": 207.54,
-			"close": 208.62,
-			"volume": 37683849,
-			"adj_high": 210.91,
-			"adj_low": 207.54,
-			"adj_close": 208.62,
-			"adj_open": 209.925,
-			"adj_volume": 38840111,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-14T00:00:00+0000"
-		},
-		{
-			"open": 210.57,
-			"high": 212.13,
-			"low": 209.86,
-			"close": 211.16,
-			"volume": 39719300,
-			"adj_high": 212.13,
-			"adj_low": 209.86,
-			"adj_close": 211.16,
-			"adj_open": 210.565,
-			"adj_volume": 39765812,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-11T00:00:00+0000"
-		},
-		{
-			"open": 210.505,
-			"high": 213.48,
-			"low": 210.12,
-			"close": 212.41,
-			"volume": 43770740,
-			"adj_high": 213.48,
-			"adj_low": 210.03,
-			"adj_close": 212.41,
-			"adj_open": 210.505,
-			"adj_volume": 44443635,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-10T00:00:00+0000"
-		},
-		{
-			"open": 209.53,
-			"high": 211.33,
-			"low": 207.22,
-			"close": 211.14,
-			"volume": 48408519,
-			"adj_high": 211.33,
-			"adj_low": 207.22,
-			"adj_close": 211.14,
-			"adj_open": 209.53,
-			"adj_volume": 48749367,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-09T00:00:00+0000"
-		},
-		{
-			"open": 210.13,
-			"high": 211.43,
-			"low": 208.45,
-			"close": 210.01,
-			"volume": 42036884,
-			"adj_high": 211.43,
-			"adj_low": 208.45,
-			"adj_close": 210.01,
-			"adj_open": 210.1,
-			"adj_volume": 42848928,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-08T00:00:00+0000"
-		},
-		{
-			"open": 212.68,
-			"high": 216.23,
-			"low": 208.8,
-			"close": 209.95,
-			"volume": 49905104,
-			"adj_high": 216.23,
-			"adj_low": 208.8,
-			"adj_close": 209.95,
-			"adj_open": 212.68,
-			"adj_volume": 50228984,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-07T00:00:00+0000"
-		},
-		{
-			"open": 212.145,
-			"high": 214.65,
-			"low": 211.8101,
-			"close": 213.55,
-			"volume": 34955836,
-			"adj_high": 214.65,
-			"adj_low": 211.8101,
-			"adj_close": 213.55,
-			"adj_open": 212.145,
-			"adj_volume": 34955836,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-03T00:00:00+0000"
-		},
-		{
-			"open": 209.08,
-			"high": 213.34,
-			"low": 208.14,
-			"close": 212.44,
-			"volume": 67834447,
-			"adj_high": 213.34,
-			"adj_low": 208.14,
-			"adj_close": 212.44,
-			"adj_open": 208.91,
-			"adj_volume": 67941811,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-02T00:00:00+0000"
-		},
-		{
-			"open": 206.665,
-			"high": 210.1865,
-			"low": 206.1401,
-			"close": 207.82,
-			"volume": 77921627,
-			"adj_high": 210.1865,
-			"adj_low": 206.1401,
-			"adj_close": 207.82,
-			"adj_open": 206.665,
-			"adj_volume": 78788867,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-07-01T00:00:00+0000"
-		},
-		{
-			"open": 202.01,
-			"high": 207.39,
-			"low": 199.2607,
-			"close": 205.17,
-			"volume": 90651078,
-			"adj_high": 207.39,
-			"adj_low": 199.2607,
-			"adj_close": 205.17,
-			"adj_open": 202.01,
-			"adj_volume": 91912816,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-06-30T00:00:00+0000"
-		},
-		{
-			"open": 201.89,
-			"high": 203.22,
-			"low": 200,
-			"close": 201.08,
-			"volume": 73114100,
-			"adj_high": 203.22,
-			"adj_low": 200,
-			"adj_close": 201.08,
-			"adj_open": 201.89,
-			"adj_volume": 73188571,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "XNAS",
-			"date": "2025-06-27T00:00:00+0000"
-		},
-		{
-			"open": 201.43,
-			"high": 202.615,
-			"low": 199.46,
-			"close": 201,
-			"volume": 50117398,
-			"adj_high": 202.64,
-			"adj_low": 199.46,
-			"adj_close": 201,
-			"adj_open": 201.43,
-			"adj_volume": 50799121,
-			"split_factor": 1,
-			"dividend": 0,
-			"symbol": "AAPL",
-			"exchange": "test",
-			"date": "2025-06-26T00:00:00+0000"
+app.get('/mkstack/eod',authenticateJWT, async function( req, res ){
+	//https://api.marketstack.com/v1/tickers?access_key=&symbols=AAPL
+	//https://api.marketstack.com/v1/exchanges?access_key=&symbols=AAPL
+	const mkstack_key=process.env.MKSTACK_KEY;
+	try{
+		const eodurl = `https://api.marketstack.com/v1/eod?access_key=${mkstack_key}&symbols=AAPL&limit=30`;
+		const response = await fetch( eodurl );
+		if( !response.ok ){
+			res.status( response.status ).send( result.statusText );
 		}
-	];*/
-	res.status( 200 ).send( result.data );//fix result.data
+
+		const result = await response.json();
+		res.status( 200 ).send( result.data );
+	}catch ( error ){
+		
+	}
+
 })
 
+app.get( '/marsweather', async function( req, res ){
+	const api_key = process.env.NASA_MARS_WEATHER_KEY;
+	const url = `https://api.nasa.gov/insight_weather/?api_key=${api_key}&feedtype=json&ver=1.0`;
+
+	try{
+		const response = await fetch( url );
+		if( !response.ok ){
+			res.status( response.status ).send( result.statusText );
+		}
+
+		const result = await response.json();
+		res.status( response.status ).send( result );
+	}catch( error ){
+		res.status( 500 ).send( error );
+	}
+
+})
 
 
 //var port = 80;
