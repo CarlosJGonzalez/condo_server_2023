@@ -882,7 +882,7 @@ app.get('/mkstack/eod', authenticateJWT, async function( req, res ){
 			"date": "2025-06-26T00:00:00+0000"
 		}
 	];*/
-	res.status( 200 ).send( result.data );//fix result.data 
+	res.status( 200 ).send( result.data );//fix result.data
 })
 
 
