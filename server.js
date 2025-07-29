@@ -16,10 +16,10 @@ const authenticateJWT = ( req, res, next ) => {
 		try{
 			jwt.verify( tokenParts[1], process.env.JWT_KEY, ( err, user )=> {
 				if( err ){
-					console.log( tokenParts[1] );
+					console.log( `BAD: ${tokenParts[1]}` );
 					return res.sendStatus( 401 );
 				}
-
+                console.log( `GOOD: ${tokenParts[1]}` );
 				req.user = user;
 				next();
 			});
