@@ -23,7 +23,7 @@ class Users{
                     role: 'admin'
                 };
 
-                const accessToken = jwt.sign( userJWT, JWT_KEY, { expiresIn: '20m' }); 
+                const accessToken = jwt.sign( userJWT, JWT_KEY, { expiresIn: '1h' }); 
                 var resp = '{"refreshtoken":"' + accessToken + '"}';
                 return callback ({ "status": 200,  message: resp });
             });

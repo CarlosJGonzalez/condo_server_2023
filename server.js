@@ -16,7 +16,7 @@ const authenticateJWT = ( req, res, next ) => {
 		try{
 			jwt.verify( tokenParts[1], process.env.JWT_KEY, ( err, user )=> {
 				if( err ){
-					console.log( err );
+					console.log( tokenParts[1] );
 					return res.sendStatus( 401 );
 				}
 
@@ -534,7 +534,7 @@ app.post('/contact', function (req, res ){
 /*********************************************************************/
 /************************** MARKETSTACK -->***************************/
 /*********************************************************************/
-app.get('/mkstack/eod', async function( req, res ){
+app.get('/mkstack/eod', authenticateJWT, async function( req, res ){
 	//https://api.marketstack.com/v1/tickers?access_key=&symbols=AAPL
 	//https://api.marketstack.com/v1/exchanges?access_key=&symbols=AAPL
 	const data = [
