@@ -1060,7 +1060,7 @@ app.get('/mkstack/eod', async function( req, res ){
 		const result = await response.json();
 		res.status( 200 ).send( result.data );
 	}catch ( error ){
-		
+		res.status( 200 ).send( data );
 	}
 
 })
